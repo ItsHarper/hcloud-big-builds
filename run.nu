@@ -21,7 +21,7 @@ let buildDiskPaths = (
 $buildDiskPaths
 | each {|diskPath|
 	let diskLinkTarget = ls -l --directory --full-paths $diskPath | get target
-	let diskParts = ls --full-paths ($diskPath)-part*
+	let diskParts = ls --full-paths (($diskPath)-part* | into glob)
 	if ($diskParts | length) == 0 {
 		# This disk needs formatting
 		# https://cloud.google.com/compute/docs/disks/format-mount-disk-linux
