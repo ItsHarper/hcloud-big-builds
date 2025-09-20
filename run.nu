@@ -13,3 +13,21 @@ let googleMetadataFlavor = (
 	| where name == "Metadata-Flavor" and value == "Google"
 	| iter only 
 )
+
+let buildDiskPaths = (
+	ls --full-paths /dev/disk/by-id/
+	| get name
+	| find --regex `google-grapheneos-build-\d+$`
+	| get buildDiskNum
+)
+
+$buildDiskPaths
+| each {|diskPath|
+	let diskLinkTarget = ls -l --directory --full-paths $diskPath | get target
+	let diskParts = ls --full-paths /dev/disk/by-id/($diskPath)-part*
+	if ($diskParts | length) == 0 {
+		# This disk needs formatting
+		# https://cloud.google.com/compute/docs/disks/format-mount-disk-linux
+		sudo mkfs.ext4 -m 0 -E lazy_itable_init=0,lazy_journal_init=0,discard $diskLinkTarget
+	}
+}
