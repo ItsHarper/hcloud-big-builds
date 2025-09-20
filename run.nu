@@ -10,7 +10,7 @@ let googleMetadataFlavor = (
 	http --full metadata.google.internal
 	| get headers
 	| get response
-	| where name == "Metadata-Flavor" and value == "Google"
+	| where name == "metadata-flavor" and value == "Google"
 	| iter only 
 )
 
