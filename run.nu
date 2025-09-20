@@ -6,13 +6,11 @@ print "------\n"
 
 # Verify that we're running in Google Cloud, so we don't have to worry
 # too much about accidentally fucking up someone's everyday setup
-let googleMetadataFlavor = (
-	http --full metadata.google.internal
-	| get headers
-	| get response
-	| where name == "metadata-flavor" and value == "Google"
-	| iter only 
-)
+http --full metadata.google.internal
+| get headers
+| get response
+| where name == "metadata-flavor" and value == "Google"
+| iter only
 
 let buildDiskPaths = (
 	ls --full-paths /dev/disk/by-id/
