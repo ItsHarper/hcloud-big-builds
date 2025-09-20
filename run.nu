@@ -16,7 +16,6 @@ let buildDiskPaths = (
 	ls --full-paths /dev/disk/by-id/
 	| get name
 	| find --regex `google-grapheneos-build-\d+$`
-	| get buildDiskNum
 )
 
 $buildDiskPaths
