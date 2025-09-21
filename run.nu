@@ -19,7 +19,7 @@ try {
 	print -e "Unexpected error occurred:"
 	print -e $e.rendered
 	if $vmInfo.isGcpVm {
-		print -e "Shutting down VM to save money"
-		sudo shutdown -h now
+		print -e "In ten minutes, the VM will shut down to save money"
+		sudo shutdown -h +10
 	}
 }
