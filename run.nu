@@ -41,7 +41,7 @@ $buildDisks
 
 		print "Rebooting in 5 seconds, so that the partition symlinks get created"
 		sleep 5sec
-		reboot
+		sudo reboot
 
 		# Don't capture the output of the previous command
 		null
