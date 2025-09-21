@@ -55,4 +55,8 @@ $buildDisks
 	let mountPoint = $"/mnt/disks/($disk.name)"
 	sudo mkdir -p $mountPoint
 	sudo mount -o discard,defaults $diskLinkTarget $mountPoint
+
+	# Don't capture the output of the previous command
+	null
 }
+| ignore
