@@ -16,7 +16,7 @@ export def download-source []: nothing -> nothing {
 	print "Ensuring needed packages are installed and updated"
 	sudo apt-get -y update
 	sudo apt-get -y upgrade
-	sudo apt-get -y install repo yarnpkg zip rsync
+	sudo apt-get -y install repo
 
 	# Update path according to GrapheneOS build instructions
 	$env.path ++= [
