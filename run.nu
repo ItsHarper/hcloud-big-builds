@@ -21,6 +21,7 @@ let buildDiskPaths = (
 $buildDiskPaths
 | each {|diskPath|
 	let diskLinkTarget = ls -l --directory --full-paths $diskPath | get target
+	# TODO(Harper): ls throws if there aren't any glob matches
 	let diskParts = ls --full-paths (($diskPath)-part* | into glob)
 	if ($diskParts | length) == 0 {
 		# This disk needs formatting
