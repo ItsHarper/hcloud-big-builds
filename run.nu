@@ -40,9 +40,12 @@ $buildDiskSymlinks
 		null
 	}
 
-	let mountPoint = $"/mnt/disks/($name)"
-	sudo mkdir -p $mountPoint
-	sudo mount -o discard,defaults $symlinkTarget $mountPoint
+	let mountpointPath = $"/mnt/disks/($name)"
+	if (mountpoint $mountpointPath | complete | get exit_code) != 0 {
+		print $"Mounting ($mountpointPath)"
+		sudo mkdir -p $mountpointPath
+		sudo mount -o discard,defaults $symlinkTarget $mountpointPath
+	}
 
 	# Don't capture the output of the previous command
 	null
