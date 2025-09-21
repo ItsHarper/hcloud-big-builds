@@ -13,9 +13,16 @@ http --full metadata.google.internal
 | iter only
 
 print "Ensuring needed packages are installed and updated"
-sudo apt-get -y update 
+sudo apt-get -y update
 sudo apt-get -y upgrade
 sudo apt-get -y install repo yarnpkg zip rsync
+
+# Update path according to GrapheneOS build instructions
+$env.path ++= [
+	"/sbin"
+	"/usr/sbin"
+	"/usr/local/sbin"
+]
 
 let buildDiskSymlinks = (
 	# Wildcards error out if no matching results are found,
