@@ -38,7 +38,7 @@ $buildDisks
 	let blkIdResult = sudo blkid $diskLinkTarget | complete
 	print $"blkid ($diskLinkTarget):"
 	print $blkIdResult
-	let needsFormatting = ($blkIdResult.exit_code != 0) or not ($blkIdResult.stdout =~ 'TYPE="EXT4"')
+	let needsFormatting = ($blkIdResult.exit_code != 0) or not ($blkIdResult.stdout | str contains -i 'TYPE="ext4"')
 	if $needsFormatting {
 		# This disk needs formatting
 		# https://cloud.google.com/compute/docs/disks/format-mount-disk-linux
