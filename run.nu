@@ -12,6 +12,11 @@ http --full metadata.google.internal
 | where name == "metadata-flavor" and value == "Google"
 | iter only
 
+print "Ensuring needed packages are installed and updated"
+sudo -y apt-get update 
+sudo -y apt-get upgrade
+sudo -y apt-get install repo yarnpkg zip rsync
+
 let buildDiskSymlinks = (
 	# Wildcards error out if no matching results are found,
 	# so we do a complete listing and perform filtering
