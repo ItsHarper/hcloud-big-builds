@@ -45,6 +45,8 @@ $buildDiskSymlinks
 		print $"Mounting ($mountpointPath)"
 		sudo mkdir -p $mountpointPath
 		sudo mount -o discard,defaults $symlinkTarget $mountpointPath
+	} else {
+		print $"Verified mountpoint at ($mountpointPath)"
 	}
 
 	# Don't capture the output of the previous command
