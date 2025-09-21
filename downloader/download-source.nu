@@ -13,13 +13,6 @@ export def download-source []: nothing -> nothing {
 	sudo apt-get -y upgrade
 	sudo apt-get -y install repo
 
-	# Update path according to GrapheneOS build instructions
-	$env.path ++= [
-			"/sbin"
-			"/usr/sbin"
-			"/usr/local/sbin"
-	]
-
 	let buildDiskSymlinks = (
 			# Wildcards error out if no matching results are found,
 			# so we do a complete listing and perform filtering
