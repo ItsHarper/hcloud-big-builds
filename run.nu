@@ -12,49 +12,37 @@ http --full metadata.google.internal
 | where name == "metadata-flavor" and value == "Google"
 | iter only
 
-# TODO(Harper): We may not need to list the parts
-let buildDiskAndPartitionDevs = (
+let buildDiskSymlinks = (
+	# Wildcards error out if no matching results are found,
+	# so we do a complete listing and perform filtering
 	ls --long --full-paths /dev/disk/by-id/
-	| where name =~ "google-grapheneos-build-"
-	| insert is-part {|listing| $listing.name =~ "part" }
+	| rename --column { name: "path" }
+	# We don't care about the partitions (if any)
+	| where $it.path =~ "google-grapheneos-build-" and not ($it.path =~ "part")
 )
 
-let buildDisks = (
-	$buildDiskAndPartitionDevs
-	| where is-part == false
-	| each {|diskDev|
-		let name = $diskDev | get name | parse --regex '.*(?<name>google-grapheneos-build-\d+)' | get name
-		let partitions = (
-			$buildDiskAndPartitionDevs
-			| where ($it.name =~ $diskDev.name) and $it.is-part
-		)
-		{ name: $name, diskDev: ($diskDev | reject is-part), partitions: ($partitions | reject is-part) }
-	}
-)
+$buildDiskSymlinks
+| each {|symlink|
+	let name: string = $symlink | get path | parse --regex '.*(?<name>google-grapheneos-build-\d+)' | get name
+	let symlinkTarget: string = $symlink | get target
 
-$buildDisks
-| each {|disk|
-	let diskLinkTarget = $disk.diskDev | get target
-	let blkIdResult = sudo blkid $diskLinkTarget | complete
-	print $"blkid ($diskLinkTarget):"
+	let blkIdResult = sudo blkid $symlinkTarget | complete
+	print $"blkid ($symlinkTarget):"
 	print $blkIdResult
 	let needsFormatting = ($blkIdResult.exit_code != 0) or not ($blkIdResult.stdout | str contains -i 'TYPE="ext4"')
+
 	if $needsFormatting {
 		# This disk needs formatting
 		# https://cloud.google.com/compute/docs/disks/format-mount-disk-linux
-		sudo mkfs.ext4 -m 0 -E lazy_itable_init=0,lazy_journal_init=0,discard $diskLinkTarget
-
-		print "Rebooting in 5 seconds, so that the partition symlinks get created"
-		sleep 5sec
-		sudo reboot
+		sudo mkfs.ext4 -m 0 -E lazy_itable_init=0,lazy_journal_init=0,discard $symlinkTarget
 
 		# Don't capture the output of the previous command
 		null
 	}
 
-	let mountPoint = $"/mnt/disks/($disk.name)"
+	let mountPoint = $"/mnt/disks/($name)"
 	sudo mkdir -p $mountPoint
-	sudo mount -o discard,defaults $diskLinkTarget $mountPoint
+	sudo mount -o discard,defaults $symlinkTarget $mountPoint
 
 	# Don't capture the output of the previous command
 	null
