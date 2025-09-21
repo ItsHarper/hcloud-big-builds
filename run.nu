@@ -36,7 +36,7 @@ $buildDisks
 | each {|disk|
 	let diskLinkTarget = $disk.diskDev | get target
 	let blkIdResult = sudo blkid $diskLinkTarget | complete
-	let needsFormatting = ($blkIdResult.exitCode != 0) or not ($blkIdResult.stdout =~ 'TYPE="EXT4"')
+	let needsFormatting = ($blkIdResult.exit_code != 0) or not ($blkIdResult.stdout =~ 'TYPE="EXT4"')
 	if $needsFormatting {
 		# This disk needs formatting
 		# https://cloud.google.com/compute/docs/disks/format-mount-disk-linux
