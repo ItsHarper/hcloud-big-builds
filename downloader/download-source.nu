@@ -1,17 +1,12 @@
 use std-rfc/iter
+use ../common/google-cloud.nu *
 
 export def download-source []: nothing -> nothing {
 	print ""
 	print "download-source.nu"
 	print "------------------\n"
 
-	# Verify that we're running in Google Cloud, so we don't have to worry
-	# too much about accidentally fucking up someone's everyday setup
-	http --full metadata.google.internal
-	| get headers
-	| get response
-	| where name == "metadata-flavor" and value == "Google"
-	| iter only
+	verify-running-in-google-cloud
 
 	print "Ensuring needed packages are installed and updated"
 	sudo apt-get -y update

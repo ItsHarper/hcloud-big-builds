@@ -1,17 +1,16 @@
-let vmName: string = http -H { Metadata-Flavor: Google } metadata.google.internal/computeMetadata/v1/instance/name
+use common/google-cloud.nu *
 
-let isBuilder = $vmName =~ "builder"
-let isDownloader = $vmName =~ "downloader"
+let vmInfo = get-vm-info
 
 print "VM info:"
-print { name: $vmName, isBuilder: $isBuilder, isDownloader: $isDownloader }
+print $vmInfo
 
-if $isDownloader {
+if $vmInfo.isDownloader {
 	use downloader/download-source.nu *
 	download-source
 }
 
-if $isBuilder {
+if $vmInfo.isBuilder {
 	use builder/build-grapheneos.nu *
 	build-grapheneos
 }
