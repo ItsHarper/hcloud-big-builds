@@ -12,6 +12,7 @@ http --full metadata.google.internal
 | where name == "metadata-flavor" and value == "Google"
 | iter only
 
+# TODO(Harper): We may not need to list the parts
 let buildDiskAndPartitionDevs = (
 	ls --long --full-paths /dev/disk/by-id/
 	| where name =~ "google-grapheneos-build-"
@@ -34,7 +35,9 @@ let buildDisks = (
 $buildDisks
 | each {|disk|
 	let diskLinkTarget = $disk.diskDev | get target
-	if ($disk.partitions | length) == 0 {
+	let blkIdResult = sudo blkid $diskLinkTarget | complete
+	let needsFormatting = ($blkIdResult.exitCode != 0) or not ($blkIdResult.stdout =~ 'TYPE="EXT4"')
+	if $needsFormatting {
 		# This disk needs formatting
 		# https://cloud.google.com/compute/docs/disks/format-mount-disk-linux
 		sudo mkfs.ext4 -m 0 -E lazy_itable_init=0,lazy_journal_init=0,discard $diskLinkTarget
