@@ -19,4 +19,7 @@ export def main []: nothing -> nothing {
 			"/usr/sbin"
 			"/usr/local/sbin"
 	]
+
+	get-build-disk-symlinks
+	| mount-build-disks
 }
