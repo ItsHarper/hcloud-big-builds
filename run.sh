@@ -13,7 +13,6 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 # Verify that we're running in Google Cloud, so we don't have to worry
 # too much about accidentally fucking up someone's everyday setup
-# TODO(Harper): Look for "Metadata-Flavor: Google"
 curl metadata.google.internal -i
 
 # Download nushell if necessary
