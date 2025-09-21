@@ -52,7 +52,7 @@ $buildDisks
 		null
 	}
 
-	let mountPoint = /mnt/disks/($disk.name)
+	let mountPoint = $"/mnt/disks/($disk.name)"
 	sudo mkdir -p $mountPoint
 	sudo mount -o discard,defaults $diskLinkTarget $mountPoint
 }
