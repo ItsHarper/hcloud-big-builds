@@ -13,3 +13,13 @@ git clone https://github.com/ItsHarper/GCP-GrapheneOS-build
 ```
 6. Add the contents of `startup.sh` as a startup script: https://cloud.google.com/compute/docs/instances/startup-scripts/linux#passing-directly
 7. Reboot the VM
+
+## Troubleshooting
+
+### Viewing logs
+
+1. Go to https://console.cloud.google.com/logs/query
+2. Run this query:
+```
+SEARCH("`startup-script:`")
+```
