@@ -37,5 +37,8 @@ $buildDisks
 		# This disk needs formatting
 		# https://cloud.google.com/compute/docs/disks/format-mount-disk-linux
 		sudo mkfs.ext4 -m 0 -E lazy_itable_init=0,lazy_journal_init=0,discard $diskLinkTarget
+
+		# Don't capture the output of the previous command
+		null
 	}
 }
