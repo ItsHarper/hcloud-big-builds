@@ -36,6 +36,8 @@ $buildDisks
 | each {|disk|
 	let diskLinkTarget = $disk.diskDev | get target
 	let blkIdResult = sudo blkid $diskLinkTarget | complete
+	print $"blkid ($diskLinkTarget):"
+	print $blkIdResult
 	let needsFormatting = ($blkIdResult.exit_code != 0) or not ($blkIdResult.stdout =~ 'TYPE="EXT4"')
 	if $needsFormatting {
 		# This disk needs formatting
