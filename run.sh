@@ -28,4 +28,4 @@ if [[ ! -f $NU_PATH ]] || [[ "$($NU_PATH --version)" != "$NU_VERSION" ]]; then
 fi
 
 echo "Running the main script using nushell"
-"$NU_BIN_DIR/nu" "$SCRIPT_DIR"/run.nu
+"$NU_BIN_DIR/nu" "$SCRIPT_DIR"/downloader/run.nu
