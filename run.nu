@@ -12,33 +12,42 @@ http --full metadata.google.internal
 | where name == "metadata-flavor" and value == "Google"
 | iter only
 
-let buildDisksAndPartitions = (
+let buildDiskAndPartitionDevs = (
 	ls --long --full-paths /dev/disk/by-id/
 	| where name =~ "google-grapheneos-build-"
 	| insert is-part {|listing| $listing.name =~ "part" }
 )
 
 let buildDisks = (
-	$buildDisksAndPartitions
+	$buildDiskAndPartitionDevs
 	| where is-part == false
-	| each {|buildDiskListing|
+	| each {|diskDev|
+		let name = $diskDev | get name | parse --regex '.*(?<name>google-grapheneos-build-\d+)' | get name
 		let partitions = (
-			$buildDisksAndPartitions
-			| where ($it.name =~ $buildDiskListing.name) and $it.is-part
+			$buildDiskAndPartitionDevs
+			| where ($it.name =~ $diskDev.name) and $it.is-part
 		)
-		{ disk: $buildDiskListing, partitions: $partitions }
+		{ name: $name, diskDev: ($diskDev | reject is-part), partitions: ($partitions | reject is-part) }
 	}
 )
 
 $buildDisks
 | each {|disk|
-	let diskLinkTarget = $disk.disk | get target
+	let diskLinkTarget = $disk.diskDev | get target
 	if ($disk.partitions | length) == 0 {
 		# This disk needs formatting
 		# https://cloud.google.com/compute/docs/disks/format-mount-disk-linux
 		sudo mkfs.ext4 -m 0 -E lazy_itable_init=0,lazy_journal_init=0,discard $diskLinkTarget
 
+		print "Rebooting in 5 seconds, so that the partition symlinks get created"
+		sleep 5sec
+		reboot
+
 		# Don't capture the output of the previous command
 		null
 	}
+
+	let mountPoint = /mnt/disks/($disk.name)
+	sudo mkdir -p $mountPoint
+	sudo mount -o discard,defaults $diskLinkTarget $mountPoint
 }
