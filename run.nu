@@ -21,12 +21,9 @@ let buildDiskSymlinks = (
 	| where $it.path =~ "google-grapheneos-build-" and not ($it.path =~ "part")
 )
 
-print $buildDiskSymlinks
 $buildDiskSymlinks
 | each {|symlink|
-	let name: string = $symlink | get path | parse --regex '.*(?<name>google-grapheneos-build-\d+)' | get name
-	print $symlink
-	print $name
+	let name: string = $symlink | get path | parse --regex '.*(?<name>google-grapheneos-build-\d+)' | iter only | get name
 	let symlinkTarget: string = $symlink | get target
 
 	let blkIdResult = sudo blkid $symlinkTarget | complete
