@@ -13,9 +13,9 @@ http --full metadata.google.internal
 | iter only
 
 print "Ensuring needed packages are installed and updated"
-sudo -y apt-get update 
-sudo -y apt-get upgrade
-sudo -y apt-get install repo yarnpkg zip rsync
+sudo apt-get -y update 
+sudo apt-get -y upgrade
+sudo apt-get -y install repo yarnpkg zip rsync
 
 let buildDiskSymlinks = (
 	# Wildcards error out if no matching results are found,
