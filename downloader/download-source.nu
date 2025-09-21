@@ -1,7 +1,7 @@
 use std-rfc/iter
 use ../common/google-cloud.nu *
 
-export def download-source []: nothing -> nothing {
+export def main []: nothing -> nothing {
 	print ""
 	print "download-source.nu"
 	print "------------------\n"
