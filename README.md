@@ -7,6 +7,7 @@
 5. Boot the VM and run these commands
 ```bash
 sudo useradd --create-home graphene
+sudo usermod -aG google-sudoers graphene
 sudo -u graphene -i
 cd ~
 git clone https://github.com/ItsHarper/GCP-GrapheneOS-build
