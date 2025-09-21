@@ -12,8 +12,9 @@ sudo -u graphene -i
 cd ~
 git clone https://github.com/ItsHarper/GCP-GrapheneOS-build
 ```
-6. Add the contents of `startup.sh` as a startup script: https://cloud.google.com/compute/docs/instances/startup-scripts/linux#passing-directly
-7. Reboot the VM
+6. Edit `/etc/apt/sources.list.d/debian.sources` so that `contrib` is included in the `Components:` list of both repos
+7. Add the contents of `startup.sh` as a startup script: https://cloud.google.com/compute/docs/instances/startup-scripts/linux#passing-directly
+8. Reboot the VM
 
 ## Troubleshooting
 
