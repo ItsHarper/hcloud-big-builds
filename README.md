@@ -5,7 +5,7 @@
   * Debian 12 (bookworm)
   * Default boot disk configuration
   * Copy `startup.sh` contents into `Startup script` field (Advanced tab)
-  * Automatic restart off (Advanced tab)
+  * MAYBE NOT: Automatic restart off (Advanced tab)
   * MAYBE NOT: Additional 275GB balanced persistent disk named `grapheneos-build-<num>`
   * I've been thinking about this from a "start low-end and test scaling up"
     perspective, but in most cases you're going to be doing builds over a
