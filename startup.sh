@@ -7,14 +7,26 @@ set -euo pipefail
 # It will be run as root in that context
 
 USERNAME=graphene
+SCRIPTS_DIR="/home/$USERNAME/GCP-GrapheneOS-build"
+SCRIPTS_REPO_URL="https://github.com/ItsHarper/GCP-GrapheneOS-build"
 
 # Verify that we're running in Google Cloud, so we don't have to worry
 # too much about accidentally fucking up someone's everyday setup
 curl metadata.google.internal -i
 
-echo "Updating GCP-GrapheneOS-build repository"
-cd "/home/$USERNAME/GCP-GrapheneOS-build"
+if [[ ! -d $SCRIPTS_DIR ]]; then
+	echo "Performing one-time setup"
+	apt install git
+	# contrib repository is needed so that the nushell scripts can install `repo`
+	add-apt-repository --component contrib
+	useradd --create-home --shell /bin/bash $USERNAME
+	usermod -aG google-sudoers $USERNAME
+	sudo -u $USERNAME git clone "$SCRIPTS_REPO_URL" "$SCRIPTS_DIR"
+fi
+
+echo "Updating scripts repository"
+cd $SCRIPTS_DIR
 sudo -u $USERNAME git pull
 
 echo "Starting run.sh"
-sudo -u $USERNAME "/home/$USERNAME/GCP-GrapheneOS-build/run.sh"
+sudo -u $USERNAME "$SCRIPTS_DIR/run.sh"

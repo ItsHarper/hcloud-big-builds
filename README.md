@@ -3,9 +3,10 @@
 1. Create Google Cloud project named `GrapheneOS Builder`
 2. Create low-power Compute Engine VM named `source-downloader`
   * Debian 12 (bookworm)
-  * 10 GB balanced persistent boot disk
-  * Additional 275GB balanced persistent disk named `grapheneos-build-<num>`
+  * Default boot disk configuration
+  * Copy `startup.sh` contents into `Startup script` field (Advanced tab)
   * Automatic restart off (Advanced tab)
+  * MAYBE NOT: Additional 275GB balanced persistent disk named `grapheneos-build-<num>`
   * I've been thinking about this from a "start low-end and test scaling up"
     perspective, but in most cases you're going to be doing builds over a
     significant period of time, and if you're relying on pre-downloaded data
@@ -24,19 +25,13 @@
     download is complete. I think it makes a good amount of sense to bump
     up the tier until the performance gains peter out (keeping in mind that
     we only allow up to 8 threads for `repo sync`).
-3. Disable automatic restart
-4. Boot the VM and run these commands
-```bash
-sudo useradd --create-home --shell /bin/bash graphene
-sudo usermod -aG google-sudoers graphene
-sudo -u graphene -i
-cd ~
-sudo apt install git
-git clone https://github.com/ItsHarper/GCP-GrapheneOS-build
-```
-5. Edit `/etc/apt/sources.list.d/debian.sources` so that `contrib` is included in the `Components:` list of both repos
-6. Add the contents of `startup.sh` as a startup script: https://cloud.google.com/compute/docs/instances/startup-scripts/linux#passing-directly
-7. Reboot the VM
+  * CPU utilization was shockingly high on c4-highmem-24 with a RAM disk and 8 sync jobs.
+  	Perhaps source code syncing could scale better than I assumed.
+  * The `prepare-for-pixel-vendor-files-generation` script caused the system to run out of RAM because of the RAM disk,
+    but the actual download process took about 22 minutes. If using a local SSD instead of a RAM disk doesn't hurt that too
+    much, that's not _too_ bad (about 65 cents of non-interruptible compute time). On Hetzner that amount of  time would cost
+    just 17 cents, and that's for a much more powerful server. So we're still in the realm of feasible for the hurry-up-and-delete
+    approach, as long as losing the RAM disk doesn't kill us.
 
 ## Troubleshooting
 
