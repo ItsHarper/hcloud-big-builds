@@ -35,7 +35,7 @@ export def sync-source [buildDir: string]: nothing -> nothing {
 	print $"Syncing source code with ($threads) threads"
 	print "-------------------"
 	timeit {
-		repo sync -j8 --force-sync --verbose
+		repo sync -j8 --force-sync --verbose out>sync-log.txt
 	}
 	| format duration min
 	| print $"repo sync took ($in)"
