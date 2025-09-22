@@ -22,6 +22,6 @@ export def sync-source [buildDir: string]: nothing -> nothing {
 	print ""
 	print "Syncing source code"
 	print "-------------------"
-	repo sync -j8 --force-sync
+	repo sync -j8 --force-sync --verbose
 	null
 }
