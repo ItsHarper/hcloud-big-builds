@@ -13,22 +13,30 @@ export def main []: nothing -> nothing {
 	verify-running-in-google-cloud
 	install-and-update-debian-packages
 
-	get-build-disk-symlinks
-	| format-unformatted-build-disks
-	| mount-build-disks
-	| each {|buildDir|
-		sync-source $buildDir
+	let buildDir = "/mnt/buildDir"
+	sudo mkdir $buildDir
+	sudo mount -t tmpfs -o size=145g tmpfs $buildDir
+	$buildDir | prepare-build-dir
 
-		cd $buildDir
-		print "Preparing for pixel vendor files generation"
-		bash (path self ./prepare-for-pixel-vendor-files-generation.sh)
-		touch $INITIAL_SETUP_COMPLETED_FILENAME
-
-		print $"Finished setting up ($buildDir)"
-	}
+	# get-build-disk-symlinks
+	# | format-unformatted-build-disks
+	# | mount-build-disks
+	# | each { prepare-build-dir }
 
 	# Don't capture the output of the previous command
 	null
+}
+
+def prepare-build-dir []: string -> nothing {
+	let buildDir = $in
+	sync-source $buildDir
+
+	cd $buildDir
+	print "Preparing for pixel vendor files generation"
+	bash (path self ./prepare-for-pixel-vendor-files-generation.sh)
+	touch $INITIAL_SETUP_COMPLETED_FILENAME
+
+	print $"Finished setting up ($buildDir)"
 }
 
 # Accepts output from get-build-disk-symlinks as input and returns it unchanged
