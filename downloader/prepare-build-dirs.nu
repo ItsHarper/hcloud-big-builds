@@ -15,10 +15,13 @@ export def main []: nothing -> nothing {
 	verify-running-in-google-cloud
 	install-and-update-debian-packages
 
-	let buildDir = "/mnt/buildDir"
-	sudo mkdir -p $buildDir
-	sudo mount -t tmpfs -o size=170g tmpfs $buildDir
-	$buildDir | prepare-build-dir
+	let buildSsdDevicePath = "/dev/disk/by-id/google-local-nvme-ssd-0"
+	let buildSsdMountpoint = "/mnt/build-ssd"
+	sudo mkfs.ext4 -F $buildSsdDevicePath
+	sudo mkdir -p $buildSsdMountpoint
+	sudo mount $buildSsdDevicePath $buildSsdMountpoint
+	sudo chmod a+w $buildSsdMountpoint
+	$buildSsdMountpoint | prepare-build-dir
 
 	# get-build-disk-symlinks
 	# | format-unformatted-build-disks
