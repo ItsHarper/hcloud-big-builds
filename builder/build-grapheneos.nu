@@ -27,7 +27,8 @@ export def main []: nothing -> nothing {
 		if not (($buildDir)/($INITIAL_SETUP_COMPLETED_FILENAME) | path exists) {
 			error make { msg: $"The intial setup has not been completed. ($buildDir) needs to be attached to a download VM first." }
 		}
-		sync-source $buildDir
+		# TODO(Harper): Decide whether to un-comment or delete
+		# sync-source $buildDir
 		null
 	}
 	| ignore
