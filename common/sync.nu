@@ -17,6 +17,8 @@ export def sync-source [buildDir: string]: nothing -> nothing {
 		repo init -u https://github.com/GrapheneOS/platform_manifest.git -b $DEV_BRANCH
 	}
 
+	print
 	print "Syncing source code"
+	print "-------------------\n"
 	repo sync -j8 --force-sync
 }
