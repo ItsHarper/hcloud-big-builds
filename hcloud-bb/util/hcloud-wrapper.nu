@@ -20,7 +20,7 @@ export def --wrapped hcloud [...rest]: nothing -> string {
 		| tar xf -
 	}
 
-	run-external $hcloudPath ...$rest
+	run-external $hcloudPath "--config" $"(get-config-dir)/hcloud-cli.toml" ...$rest
 }
 
 def get-hcloud-dir []: nothing -> string {
