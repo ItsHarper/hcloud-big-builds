@@ -31,6 +31,7 @@ sudo useradd --create-home --shell /bin/bash graphene
 sudo usermod -aG google-sudoers graphene
 sudo -u graphene -i
 cd ~
+sudo apt install git
 git clone https://github.com/ItsHarper/GCP-GrapheneOS-build
 ```
 5. Edit `/etc/apt/sources.list.d/debian.sources` so that `contrib` is included in the `Components:` list of both repos
