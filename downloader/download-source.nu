@@ -5,6 +5,8 @@ use ../common/google-cloud.nu *
 use ../common/mount.nu *
 use ../common/sync.nu *
 
+const PREPARE_PIXEL_FILES_SCRIPT_PATH = path self ./prepare-for-pixel-vendor-files-generation.sh
+
 export def main []: nothing -> nothing {
 	print ""
 	print "download-source.nu"
@@ -33,7 +35,7 @@ def prepare-build-dir []: string -> nothing {
 
 	cd $buildDir
 	print "Preparing for pixel vendor files generation"
-	bash (path self ./prepare-for-pixel-vendor-files-generation.sh)
+	bash $PREPARE_PIXEL_FILES_SCRIPT_PATH
 	touch $INITIAL_SETUP_COMPLETED_FILENAME
 
 	print $"Finished setting up ($buildDir)"
