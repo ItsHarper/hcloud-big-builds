@@ -7,15 +7,11 @@ print $vmInfo
 
 try {
 	timeit {
-		if $vmInfo.isDownloader {
-			use downloader/prepare-build-dirs.nu *
-			prepare-build-dirs
-		}
+		use downloader/prepare-build-dirs.nu *
+		prepare-build-dirs
 
-		if $vmInfo.isBuilder {
-			use builder/build-grapheneos.nu *
-			build-grapheneos
-		}
+		use builder/build-grapheneos.nu *
+		build-grapheneos
 	}
 	| format duration min
 	| print $"Finished. Complete process took ($in)"
