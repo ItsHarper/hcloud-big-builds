@@ -38,8 +38,11 @@ def build [buildDir: string]: nothing -> nothing {
 	$PIXEL_DEVICES_TO_BUILD
 	| each {|pixelCodename|
 		print $"Generating vendor files for ($pixelCodename)"
-		adevtool generate-all -d $pixelCodename
-		null
+		timeit {
+			adevtool generate-all -d $pixelCodename
+		}
+		| format duration min
+		| print $"vendor file generation took ($in)"
 	}
 	| ignore
 }
