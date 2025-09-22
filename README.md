@@ -27,7 +27,7 @@
 3. Disable automatic restart
 4. Boot the VM and run these commands
 ```bash
-sudo useradd --create-home graphene
+sudo useradd --create-home --shell /bin/bash graphene
 sudo usermod -aG google-sudoers graphene
 sudo -u graphene -i
 cd ~
