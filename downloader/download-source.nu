@@ -14,7 +14,7 @@ export def main []: nothing -> nothing {
 	install-and-update-debian-packages
 
 	let buildDir = "/mnt/buildDir"
-	sudo mkdir $buildDir
+	sudo mkdir -p $buildDir
 	sudo mount -t tmpfs -o size=145g tmpfs $buildDir
 	$buildDir | prepare-build-dir
 
