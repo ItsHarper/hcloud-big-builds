@@ -16,7 +16,8 @@ curl metadata.google.internal -i
 
 if [[ ! -d $SCRIPTS_DIR ]]; then
 	echo "Performing one-time setup"
-	apt-get -y install git
+	# software-properties-common is needed for add-apt-repository
+	apt-get -y install git software-properties-common
 	# contrib repository is needed so that the nushell scripts can install `repo`
 	add-apt-repository --component contrib
 	useradd --create-home --shell /bin/bash $USERNAME
