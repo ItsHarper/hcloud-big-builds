@@ -19,8 +19,16 @@ export def sync-source [buildDir: string]: nothing -> nothing {
 		null
 	}
 
+	let threads = (
+		[
+			sys cpu | length
+			8
+		]
+		| math min
+	)
+
 	print ""
-	print "Syncing source code"
+	print $"Syncing source code with ($threads) threads"
 	print "-------------------"
 	repo sync -j8 --force-sync --verbose
 	null
