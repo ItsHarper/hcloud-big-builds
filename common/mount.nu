@@ -11,7 +11,7 @@ export def get-build-disk-symlinks []: nothing -> table {
 }
 
 # Accepts output from a table entry from get-build-disk-symlinks as input
-export def get-mountpoint-path [symlinkRecord: record<path: string>]: nothing -> string {
+def get-mountpoint-path [symlinkRecord: record<path: string>]: nothing -> string {
 	let name = (
 		$symlinkRecord
 		| get path
@@ -24,7 +24,8 @@ export def get-mountpoint-path [symlinkRecord: record<path: string>]: nothing ->
 }
 
 # Accepts output from get-build-disk-symlinks as input
-export def mount-build-disks []: table -> nothing {
+# Returns list of build disk mountpoints
+export def mount-build-disks []: table -> list<string> {
 	each {|diskSymlink|
 		let mountpointPath = get-mountpoint-path $diskSymlink
 		if (mountpoint $mountpointPath | complete | get exit_code) != 0 {
@@ -35,6 +36,7 @@ export def mount-build-disks []: table -> nothing {
 		} else {
 			print $"Verified mountpoint at ($mountpointPath)"
 		}
+
+		$mountpointPath
 	}
-	| ignore
 }

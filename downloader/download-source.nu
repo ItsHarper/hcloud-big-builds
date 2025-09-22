@@ -1,6 +1,9 @@
 use std-rfc/iter
+use ../common/constants.nu *
+use ../common/debian.nu *
 use ../common/google-cloud.nu *
 use ../common/mount.nu *
+use ../common/sync.nu *
 
 export def main []: nothing -> nothing {
 	print ""
@@ -8,15 +11,21 @@ export def main []: nothing -> nothing {
 	print "------------------\n"
 
 	verify-running-in-google-cloud
-
-	print "Ensuring needed packages are installed and updated"
-	sudo apt-get -y update
-	sudo apt-get -y upgrade
-	sudo apt-get -y install repo
+	install-and-update-debian-packages
 
 	get-build-disk-symlinks
 	| format-unformatted-build-disks
 	| mount-build-disks
+	| each {|buildDir|
+		sync-source $buildDir
+
+		cd $buildDir
+		print "Preparing for pixel vendor files generation"
+		bash (path self ./prepare-for-pixel-vendor-files-generation.sh)
+		touch $INITIAL_SETUP_COMPLETED_FILENAME
+
+		print $"Finished setting up ($buildDir)"
+	}
 
 	# Don't capture the output of the previous command
 	null
