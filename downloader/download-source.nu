@@ -15,7 +15,7 @@ export def main []: nothing -> nothing {
 
 	let buildDir = "/mnt/buildDir"
 	sudo mkdir -p $buildDir
-	sudo mount -t tmpfs -o size=145g tmpfs $buildDir
+	sudo mount -t tmpfs -o size=170g tmpfs $buildDir
 	$buildDir | prepare-build-dir
 
 	# get-build-disk-symlinks
