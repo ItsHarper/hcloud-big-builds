@@ -12,13 +12,16 @@ export def sync-source [buildDir: string]: nothing -> nothing {
 		git config gpg.ssh.allowedSignersFile ~/.ssh/grapheneos_allowed_signers
 		git verify-tag (git describe)
 		cd ../..
+		null
 	} else {
 		print $"Initializing ($buildDir) for dev branch ($DEV_BRANCH)"
 		repo init -u https://github.com/GrapheneOS/platform_manifest.git -b $DEV_BRANCH
+		null
 	}
 
 	print ""
 	print "Syncing source code"
-	print "-------------------\n"
+	print "-------------------"
 	repo sync -j8 --force-sync
+	null
 }
