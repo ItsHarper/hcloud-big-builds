@@ -17,8 +17,8 @@ try {
 			build-grapheneos
 		}
 	}
-
-	print "Finished"
+	| format duration min
+	| print $"Finished. Complete process took ($in)"
 
 	if $vmInfo.isGcpVm {
 		print "The VM will now shut down to save money"
