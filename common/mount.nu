@@ -32,6 +32,8 @@ export def mount-build-disks []: table -> list<string> {
 			print $"Mounting ($mountpointPath)"
 			sudo mkdir -p $mountpointPath
 			sudo mount -o discard,defaults $diskSymlink.target $mountpointPath
+			let username = (whoami)
+			sudo chown $username $mountpointPath
 			null
 		} else {
 			print $"Verified mountpoint at ($mountpointPath)"
