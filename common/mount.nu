@@ -26,19 +26,22 @@ def get-mountpoint-path [symlinkRecord: record<path: string>]: nothing -> string
 # Accepts output from get-build-disk-symlinks as input
 # Returns list of build disk mountpoints
 export def mount-build-disks []: table -> list<string> {
-	each {|diskSymlink|
+	let diskSymlinks = $in
+	let username = (whoami)
+
+	$diskSymlinks
+	| each {|diskSymlink|
 		let mountpointPath = get-mountpoint-path $diskSymlink
 		if (mountpoint $mountpointPath | complete | get exit_code) != 0 {
 			print $"Mounting ($mountpointPath)"
 			sudo mkdir -p $mountpointPath
 			sudo mount -o discard,defaults $diskSymlink.target $mountpointPath
-			let username = (whoami)
-			sudo chown $username $mountpointPath
 			null
 		} else {
 			print $"Verified mountpoint at ($mountpointPath)"
 		}
 
+		sudo chown $username $mountpointPath
 		$mountpointPath
 	}
 }
