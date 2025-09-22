@@ -8,8 +8,8 @@ print $vmInfo
 try {
 	timeit {
 		if $vmInfo.isDownloader {
-			use downloader/download-source.nu *
-			download-source
+			use downloader/prepare-build-dirs.nu *
+			prepare-build-dirs
 		}
 
 		if $vmInfo.isBuilder {
