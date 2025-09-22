@@ -1,4 +1,4 @@
-use ../common/constants.nu *
+use ../common/graphene-constants.nu *
 
 export def sync-source [buildDir: string]: nothing -> nothing {
 	cd $buildDir
