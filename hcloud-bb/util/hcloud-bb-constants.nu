@@ -1,3 +1,12 @@
+# Settings
+export const CONTEXT_NAME = "grapheneos-build"
+
+# Other
+export const HCLOUD_CONFIG_FILENAME = "hcloud-cli.toml"
+export const CONFIG_DIR_GITIGNORE_CONTENTS = $"
+($HCLOUD_CONFIG_FILENAME)
+"
+
 export def get-config-dir []: nothing -> string {
 	let result = (
 		$env
