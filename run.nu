@@ -6,14 +6,16 @@ print "VM info:"
 print $vmInfo
 
 try {
-	if $vmInfo.isDownloader {
-		use downloader/download-source.nu *
-		download-source
-	}
+	timeit {
+		if $vmInfo.isDownloader {
+			use downloader/download-source.nu *
+			download-source
+		}
 
-	if $vmInfo.isBuilder {
-		use builder/build-grapheneos.nu *
-		build-grapheneos
+		if $vmInfo.isBuilder {
+			use builder/build-grapheneos.nu *
+			build-grapheneos
+		}
 	}
 
 	print "Finished"
