@@ -21,7 +21,7 @@ export def sync-source [buildDir: string]: nothing -> nothing {
 
 	let threads = (
 		[
-			2 * (sys cpu | length)
+			sys cpu | length
 			8
 		]
 		| math min
