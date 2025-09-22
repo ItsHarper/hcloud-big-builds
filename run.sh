@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-# Intended to be run on a Debian 12 (bookworm) Compute Engine VM
+# Intended to be run on a Compute Engine VM running Debian
 
 NU_VERSION="0.107.0"
 NU_ARCHIVES_DIR="$HOME/nushell-bin-archives"

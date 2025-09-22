@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-# This script is intended to be a Compute Engine startup script:
+# This script is intended to be a Compute Engine startup script used on a Debian VM:
 # https://cloud.google.com/compute/docs/instances/startup-scripts/linux
 #
 # It will be run as root in that context

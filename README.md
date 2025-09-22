@@ -2,7 +2,7 @@
 
 1. Create Google Cloud project named `GrapheneOS Builder`
 2. Create low-power Compute Engine VM named `source-downloader`
-  * Debian 12 (bookworm)
+  * Debian 13 (trixie)
   * Default boot disk configuration
   * Copy `startup.sh` contents into `Startup script` field (Advanced tab)
   * MAYBE NOT: Automatic restart off (Advanced tab)
