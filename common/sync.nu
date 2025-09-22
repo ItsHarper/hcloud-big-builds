@@ -5,7 +5,7 @@ export def sync-source [buildDir: string]: nothing -> nothing {
 
 	if $DOWNLOAD_STABLE {
 		print $"Initializing ($buildDir) for stable tag ($STABLE_TAG)"
-		repo init --force-sync -u https://github.com/GrapheneOS/platform_manifest.git -b refs/tags/($STABLE_TAG)
+		repo init -u https://github.com/GrapheneOS/platform_manifest.git -b refs/tags/($STABLE_TAG)
 		curl https://grapheneos.org/allowed_signers > ~/.ssh/grapheneos_allowed_signers
 		cd .repo/manifests
 		git config gpg.ssh.allowedSignersFile ~/.ssh/grapheneos_allowed_signers
@@ -13,9 +13,9 @@ export def sync-source [buildDir: string]: nothing -> nothing {
 		cd ../..
 	} else {
 		print $"Initializing ($buildDir) for dev branch ($DEV_BRANCH)"
-		repo init --force-sync -u https://github.com/GrapheneOS/platform_manifest.git -b $DEV_BRANCH
+		repo init -u https://github.com/GrapheneOS/platform_manifest.git -b $DEV_BRANCH
 	}
 
 	print "Syncing source code"
-	repo sync -j8
+	repo sync -j8 --force-sync
 }
