@@ -15,6 +15,13 @@ try {
 		use builder/build-grapheneos.nu *
 		build-grapheneos
 	}
+
+	print "Finished"
+
+	if $vmInfo.isGcpVm {
+		print "The VM will now shut down to save money"
+		sudo shutdown -h now
+	}
 } catch {|e|
 	print -e "Unexpected error occurred:"
 	print -e $e.rendered
