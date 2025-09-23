@@ -4,7 +4,7 @@ export const CONTEXT_NAME = "hcloud-bb"
 # Other
 export const HCLOUD_CONFIG_FILENAME = "hcloud-cli.toml"
 export const CONFIG_DIR_GITIGNORE_CONTENTS = $"
-# As of version 1.52.0, the hcloud cli stores its credentials in its config file
+# Contains references to local-only SSH keys and potentially even actual credentials
 ($HCLOUD_CONFIG_FILENAME)
 "
 
