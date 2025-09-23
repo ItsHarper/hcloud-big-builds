@@ -20,11 +20,7 @@ export def --wrapped hcloud [...rest]: nothing -> string {
 		| tar xf -
 	}
 
-	let configDir = get-config-dir
-	$CONFIG_DIR_GITIGNORE_CONTENTS
-	| save --force ($configDir)/.gitignore
-
-	run-external $hcloudPath "--config" $"($configDir)/($HCLOUD_CONFIG_FILENAME)" ...$rest
+	run-external $hcloudPath "--config" $"(get-config-dir)/($HCLOUD_CONFIG_FILENAME)" ...$rest
 }
 
 def get-hcloud-dir []: nothing -> string {

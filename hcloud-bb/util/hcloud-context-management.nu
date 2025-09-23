@@ -2,9 +2,18 @@ use ./hcloud-bb-constants.nu *
 use hcloud-wrapper.nu *
 
 export def set-up-hcloud-context []: nothing -> nothing {
-	let activeContext = (hcloud context active)
-	if $activeContext == "" {
+	let configDir = (get-config-dir)
+	let desiredContext = $CONTEXT_NAME
+
+	# Before we potentially collect and/or generate credentials,
+	# write the .gitignore file to the config folder to prevent
+	# them from being erroneously committed
+	$CONFIG_DIR_GITIGNORE_CONTENTS
+	| save --force ($configDir)/.gitignore
+
+	if (hcloud context active) != $desiredContext {
+		# TODO(Harper): Check if the context exists but is not active
 		print "When prompted, provide a read/write API token for the appropriate Hetzner Cloud project"
-		hcloud context create $CONTEXT_NAME
+		hcloud context create $desiredContext
 	}
 }
