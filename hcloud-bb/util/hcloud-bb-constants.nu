@@ -1,5 +1,5 @@
 # Settings
-export const CONTEXT_NAME = "grapheneos-build"
+export const CONTEXT_NAME = "hcloud-bb"
 
 # Other
 export const HCLOUD_CONFIG_FILENAME = "hcloud-cli.toml"
