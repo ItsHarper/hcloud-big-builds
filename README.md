@@ -1,27 +1,21 @@
-## Setup
+## High level architecture options
 
-1. Create Google Cloud project named `GrapheneOS Builder`
-2. Create low-power Compute Engine VM named `source-downloader`
-  * Debian 13 (trixie)
-  * Default boot disk configuration
-  * Copy `startup.sh` contents into `Startup script` field (Advanced tab)
-  * MAYBE NOT: Automatic restart off (Advanced tab)
-  * MAYBE NOT: Additional 275GB balanced persistent disk named `grapheneos-build-<num>`
+The current plan is to go straight to Hetzner instead of continuing to do perf
+analysis in GCP first. Keep reading for why Hetzner's offering seems like such
+a great fit.
 
-## High level options
-
-* Google Cloud (tortoise)
+* GCP (tortoise strategy)
 	* Only fast enough if we always keep storage allocated
 	* Constant storage allocation means high fixed costs
-* Google Cloud (hare)
+* GCP (hare strategy)
 	* All persistent storage types are high-latency
-	* Only temporary storage can be used for actually building
-	* Spot VM isn't viable without persistent storage, so we're paying full price for compute
+	* Only temporary storage is fast enough to actually build from
+	* Spot VM isn't viable without persistent storage, so we'd have to pay full price for compute
 	* Two sub-options
 		* Every build costs the full amount
-			* I suspect this will cost well over $1 per build
+			* I suspect this would cost well over the max target $1 per build
 		* Store data to Google Cloud Storage between builds
-			* Enables Very Flexible Pricing scheme (GCS)
+			* Enables Very Flexible Pricing scheme (GCP)
 				* One-off build: $`X`
 				* Batch of builds: $`X + (hours * 0.011) + (?? * builds)`
 			* Adds complexity
@@ -30,7 +24,7 @@
 			* Incremental builds may be slow enough to make VFP too expensive (`??` in the formula)
 * Hetzner
 	* Enables Very Flexible Pricing scheme (Hetzner)
-		* One-off build: $`Y` (almost certainly much cheaper than Google Cloud's `X`)
+		* One-off build: $`Y` (almost certainly much cheaper than GCP's `X`)
 		* Batch of builds: $`Y + (hours * 0.0306)`
 	* Builds are done on high-performance VMs, probably their top tier
 	* Build directory is located on Block Storage volume
@@ -38,16 +32,7 @@
 		* Can be detached from the VM and persist after the VM is destroyed
 	* Very simple
 	* The cost to do an incremental build will hopefully be low enough to ignore
-
-## Troubleshooting
-
-### Viewing logs
-
-1. Go to https://console.cloud.google.com/logs/query
-2. Run this query:
-```
-SEARCH("`startup-script:`")
-```
+	* Should enable the holy grail: cheap, reasonably fast initial build, extremely fast incremental builds
 
 ## TODO
 
@@ -87,3 +72,13 @@ SEARCH("`startup-script:`")
   much, that's not _too_ bad (about 65 cents of non-interruptible compute time). On Hetzner that amount of  time would cost
   just 17 cents, and that's for a much more powerful server. So we're still in the realm of feasible for the hurry-up-and-delete
   approach, as long as losing the RAM disk doesn't kill us.
+
+## Setup instructions for original GCP prototype
+
+1. Create Google Cloud project named `GrapheneOS Builder`
+2. Create low-power Compute Engine VM named `source-downloader`
+  * Debian 13 (trixie)
+  * Default boot disk configuration
+  * Copy `startup.sh` contents into `Startup script` field (Advanced tab)
+  * MAYBE NOT: Automatic restart off (Advanced tab)
+  * MAYBE NOT: Additional 275GB balanced persistent disk named `grapheneos-build-<num>`
