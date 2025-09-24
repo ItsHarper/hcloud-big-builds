@@ -4,10 +4,9 @@ use ./hcloud-wrapper.nu *
 
 export def set-up-hcloud-context []: nothing -> nothing {
 	let desiredContext = $CONTEXT_NAME
-	# Our VMs are ephemeral, so the SSH keys to log into them are considered state, not configuration
-	let sshKeysDir = (get-state-dir)/hcloud-ssh-keys
+	let sshKeysDir = "~/.ssh" | path expand
 	let sshKeyName = get-local-ssh-key-name $desiredContext
-	let sshKeyPath = ($sshKeysDir)/($sshKeyName)
+	let sshKeyPath = ($sshKeysDir)/hcloud-bb-($sshKeyName)
 
 	# Before we potentially collect and/or generate credentials,
 	# write the .gitignore file to the config folder to prevent
