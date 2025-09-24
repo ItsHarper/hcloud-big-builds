@@ -1,6 +1,12 @@
 # Settings
 export const CONTEXT_NAME = "hcloud-bb"
 
+export const SERVER_NAME = "grapheneos-build"
+export const SERVER_TYPE = "cx22"
+# TODO(Harper): Verify that Debian 13 doesn't give us issues
+export const SERVER_IMAGE = "debian-13"
+export const SERVER_LOCATION = "ash" # Ashburn, VA
+
 # Other
 export const HCLOUD_CONFIG_FILENAME = "hcloud-cli.toml"
 export const CONFIG_DIR_GITIGNORE_CONTENTS = $"
