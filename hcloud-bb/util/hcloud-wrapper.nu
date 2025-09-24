@@ -8,16 +8,17 @@ export def --wrapped hcloud [...rest]: nothing -> string {
 
 	if not ($hcloudPath | path exists) or (run-external $hcloudPath "version") != $"hcloud ($HCLOUD_VERSION)" {
 		# TODO(Harper): Package nu_plugin_compress for Chimera Linux
-		plugin use compress
+		error make { msg: "`hcloud` download code is currently disabled" }
+		# plugin use compress
 
-		let hcloudDir = get-hcloud-dir
-		mkdir $hcloudDir
-		cd $hcloudDir
+		# let hcloudDir = get-hcloud-dir
+		# mkdir $hcloudDir
+		# cd $hcloudDir
 
-		print $"Downloading hcloud ($HCLOUD_VERSION)"
-		http $"https://github.com/hetznercloud/cli/releases/download/v($HCLOUD_VERSION)/hcloud-linux-amd64.tar.gz"
-		| from gz
-		| tar xf -
+		# print $"Downloading hcloud ($HCLOUD_VERSION)"
+		# http $"https://github.com/hetznercloud/cli/releases/download/v($HCLOUD_VERSION)/hcloud-linux-amd64.tar.gz"
+		# | from gz
+		# | tar xf -
 	}
 
 	run-external $hcloudPath "--config" $"(get-config-dir)/($HCLOUD_CONFIG_FILENAME)" ...$rest
