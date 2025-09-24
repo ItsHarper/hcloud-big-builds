@@ -41,6 +41,8 @@ a great fit.
 	* When setup container fails, volume is marked as not-for-use (but kept for a period of time to allow troubleshooting)
 	* We can provide some pre-made setup containers that accept environment variables for source location, auth token, etc
 	* Machine type can be configured separately for the setup container and the build container
+		* Extremely low priority. Hetzner charges by the hour, so this would only make sense if your setup
+		  process is slow regardless of what hardware it's running on
 * Beyond making it easy for people to build GrapheneOS, the obvious next place to take this is OpenDroid, a next-gen F-Droid alternative.
 
 ## Older notes on performance tiers and such
