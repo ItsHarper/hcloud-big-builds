@@ -46,15 +46,16 @@ export def main []: nothing -> nothing {
 	}
 
 	try {
+		print "Destroying server"
 		# TODO(Harper): Destroy server
 	} catch {|e|
-		print -e "Cause of failure to destroy server:"
+		print -e "Failed to destroy server. Cause:"
 		print -e $e.rendered
 		error make { msg: "CRITICAL ERROR: Failed to destroy server. You are leaking money." }
 	}
 
 	if not $setupSucceeded or not $buildSucceeded {
-		error make { msg: "Failed to start session, see prior output" }
+		error make { msg: "Failed to start session, see prior output. Make sure to destroy the volume after investigating." }
 	}
 
 	null
