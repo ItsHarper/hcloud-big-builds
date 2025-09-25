@@ -2,61 +2,74 @@ use ../util/hcloud-bb-constants.nu *
 use ../util/hcloud-context-management.nu *
 use ../util/hcloud-wrapper.nu *
 
-export def main []: nothing -> nothing {
+# TODO(Harper): Set up pruning system
+#
+# Instead of performing any cleanup here, merely update the state of the session (before starting to make actual changes). Throw if that fails.
+#
+# The session tracking system will be responsible for creating session IDs, so that collisions can be guaranteed not to occur.
+#
+# `prune` command operates based on the state of the sessions:
+# * starting (keep volume and VM)
+# * initializingBuildEnvironment (keep volume and VM)
+# * building (keep volume and VM)
+# * ready (keep volume only)
+# * buildEnvironmentInitializationFailure (keep volume)
+# * investigatingBuildEnvironmentInitializationFailure (keep volume and VM)
+# * destroyed (keep nothing)
+#
+# Build errors result in the `ready` state, build environment initialization errors result in the
+# `buildEnvironmentInitializationFailure` state, and all other errors result in the `destroyed` state
+
+# TODO(Harper): Set up independent monitoring for pruning system
+#
+
+export def main []: nothing -> string {
 	set-up-hcloud-context
 
-	# While server creation is done in more than one context, it's (currently) important that
-	# the error handling is all handled at this level, so it's better not to abstract it into
-	# a custom command.
+	let sessionId = random chars --length 7
+	let resourcesName = ($RESOURCES_NAME_PREFIX)-($sessionId)
+
 	try {
-		# hcloud server create --name $SERVER_NAME --type $SERVER_TYPE --image $SERVER_IMAGE
-		true
+		# TODO(Harper): Determine whether the hcloud docs actually mean "GB" or if they really mean "GiB"
+		print "Creating volume"
+		hcloud volume create --name $resourcesName --size $VOLUME_SIZE_GiB --format $VOLUME_FS --location $VM_LOCATION --output "json"
+
+		print "Creating VM"
+		hcloud server create --name $resourcesName --volume $resourcesName --type $VM_TYPE --image $VM_IMAGE --location $VM_LOCATION --output "json"
+
+		print "Setting up VM"
+		# TODO(Harper): Run VM setup script without capturing output
+		# mount -o discard,defaults /dev/disk/by-id/scsi-0HC_Volume_103544754 /mnt/build-root
+
+		null
 	} catch {|e|
-		# TODO(Harper): Ensure that the machine is not left in a half-created state
-		print -e "Cause of failure to create server:"
+		print -e "Failed to set up VM:"
 		print -e $e.rendered
-		error make { msg: "Failed to create server, see prior output" }
-	}
-
-	# Now that the server exists, an error from this point forwards must not prevent
-	# the end of the function from being reached
-	# TODO: Guarantee this using a future nushell feature or community-provided solution:
-	#       https://github.com/nushell/nushell/issues/15941
-
-	let setupSucceeded: bool = try {
-		# TODO(Harper): Run setup without capturing output
-		print "Setup step finished"
-		true
-	} catch {|e|
-		print -e "Setup step failed, see prior output"
-		false
-	}
-
-	let buildSucceeded: bool = if $setupSucceeded {
-		try {
-			# TODO(Harper): Run build without capturing output
-			print "Build finished"
-			true
-		} catch {|e|
-			print -e "Build step failed, see prior output"
-			false
-		}
-	} else {
-		false
+		error make { msg: "Session was not started (VM setup failed). This is not a bug in the build or build environment initialization scripts." }
 	}
 
 	try {
-		print "Destroying server"
-		# TODO(Harper): Destroy server
+		print "Initializing build environment"
+		# TODO(Harper): Run build environment initialization without capturing output
 	} catch {|e|
-		print -e "Failed to destroy server. Cause:"
+		print -e "Failed to initialize build environment:"
 		print -e $e.rendered
-		error make { msg: "CRITICAL ERROR: Failed to destroy server. You are leaking money." }
+		error make { msg: "Session was not started (build setup step failed). Make sure to destroy the volume after investigating." }
 	}
 
-	if not $setupSucceeded or not $buildSucceeded {
-		error make { msg: "Failed to start session, see prior output. Make sure to destroy the volume after investigating." }
+	try {
+		print $"Successfully started session ($sessionId)"
+		print "Running first build"
+		# TODO(Harper): Run build without capturing output
+		print "First build succeeded"
+	} catch {|e|
+		print -e "First build failed:"
+		print -e $e.rendered
+		print  "\nSession was successfully created and is valid despite build failure"
 	}
 
-	null
+	$sessionId
 }
+
+# For pruning system:
+# print -e "ERROR: Failed to destroy VM. You are leaking money."

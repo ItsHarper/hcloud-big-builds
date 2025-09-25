@@ -1,11 +1,14 @@
 # Settings
 export const CONTEXT_NAME = "hcloud-bb"
+export const RESOURCES_NAME_PREFIX = $CONTEXT_NAME
 
-export const SERVER_NAME = "grapheneos-build"
-export const SERVER_TYPE = "cpx11"
+export const VM_TYPE = "cpx11"
 # TODO(Harper): Verify that Debian 13 doesn't give us issues
-export const SERVER_IMAGE = "debian-13"
-export const SERVER_LOCATION = "ash" # Ashburn, VA
+export const VM_IMAGE = "debian-13"
+export const VM_LOCATION = "ash" # Ashburn, VA
+
+export const VOLUME_SIZE_GiB = 10
+export const VOLUME_FS = "ext4"
 
 # Other
 export const HCLOUD_CONFIG_FILENAME = "hcloud-cli.toml"
