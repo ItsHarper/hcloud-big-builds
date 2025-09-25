@@ -43,6 +43,7 @@ a great fit.
 	* Machine type can be configured separately for the setup container and the build container
 		* Extremely low priority. Hetzner charges by the hour, so this would only make sense if your setup
 		  process is slow regardless of what hardware it's running on
+* Allow configuring minimum time that the server is kept alive after a build
 * Beyond making it easy for people to build GrapheneOS, the obvious next place to take this is OpenDroid, a next-gen F-Droid alternative.
 
 ## Older notes on performance tiers and such
