@@ -19,6 +19,9 @@ use ../util/hcloud-wrapper.nu *
 #
 # Build errors result in the `ready` state, build environment initialization errors result in the
 # `buildEnvironmentInitializationFailure` state, and all other errors result in the `destroyed` state
+#
+# VMs are not deleted until the hour that has been paid for has almost ended (run
+# `server describe` and examine the `created` field)
 
 # TODO(Harper): Set up independent monitoring for pruning system
 #
