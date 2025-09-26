@@ -17,6 +17,8 @@ export const CONFIG_DIR_GITIGNORE_CONTENTS = $"
 ($HCLOUD_CONFIG_FILENAME)
 "
 
+export const BUILD_DIR_MOUNTPOINT = "/mnt/build-root"
+
 export def get-config-dir []: nothing -> string {
 	let result = (
 		$env

@@ -35,14 +35,25 @@ export def main []: nothing -> string {
 	try {
 		# TODO(Harper): Determine whether the hcloud docs actually mean "GB" or if they really mean "GiB"
 		print "Creating volume"
-		hcloud volume create --name $resourcesName --size $VOLUME_SIZE_GiB --format $VOLUME_FS --location $VM_LOCATION --output "json"
+		let volumeInfo: record = (
+			hcloud volume create --name $resourcesName --size $VOLUME_SIZE_GiB --format $VOLUME_FS --location $VM_LOCATION --output "json"
+			| from json
+		)
+
+		let volumeLinuxDevice = $volumeInfo.volume.linux_device
+		let cloudConfig = $'
+#cloud-config
+
+mounts:
+- [($volumeLinuxDevice), ($BUILD_DIR_MOUNTPOINT), ($VOLUME_FS), "discard,defaults", "0", "2"]
+'
 
 		print "Creating VM"
-		hcloud server create --name $resourcesName --volume $resourcesName --type $VM_TYPE --image $VM_IMAGE --location $VM_LOCATION --output "json"
-
-		print "Setting up VM"
-		# TODO(Harper): Run VM setup script without capturing output
-		# mount -o discard,defaults /dev/disk/by-id/scsi-0HC_Volume_103544754 /mnt/build-root
+		let vmInfo = (
+			$cloudConfig
+			| hcloud server create --user-data-from-file - --name $resourcesName --volume $resourcesName --type $VM_TYPE --image $VM_IMAGE --location $VM_LOCATION --output "json"
+			| from json
+		)
 
 		null
 	} catch {|e|

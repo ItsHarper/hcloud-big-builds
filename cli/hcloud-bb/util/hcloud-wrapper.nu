@@ -3,7 +3,8 @@ use ./hcloud-bb-constants.nu *
 const HCLOUD_VERSION = "1.52.0"
 
 # Run pinned version of hcloud
-export def --wrapped hcloud [...rest]: nothing -> string {
+export def --wrapped hcloud [...rest]: oneof<nothing, string> -> string {
+	let input = $in
 	let hcloudPath = get-hcloud-path
 
 	if not ($hcloudPath | path exists) or (run-external $hcloudPath "version") != $"hcloud ($HCLOUD_VERSION)" {
@@ -21,7 +22,7 @@ export def --wrapped hcloud [...rest]: nothing -> string {
 		# | tar xf -
 	}
 
-	run-external $hcloudPath "--config" $"(get-config-dir)/($HCLOUD_CONFIG_FILENAME)" ...$rest
+	$input | run-external $hcloudPath "--config" $"(get-config-dir)/($HCLOUD_CONFIG_FILENAME)" ...$rest
 }
 
 def get-hcloud-dir []: nothing -> string {
