@@ -36,6 +36,9 @@ a great fit.
 
 ## TODO
 
+* Track active sessions in Object Storage
+	* For now, delete the whole bucket if no sessions are active
+* Store build artifacts in Object Storage
 * Security
 	* Firewall that disallows all incoming traffic (the goal is to not need SSH)
 	* VM setup is performed by something like cloud-init

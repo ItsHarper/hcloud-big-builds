@@ -5,7 +5,7 @@ export const RESOURCES_NAME_PREFIX = $CONTEXT_NAME
 export const VM_TYPE = "cpx11"
 # TODO(Harper): Verify that Debian 13 doesn't give us issues
 export const VM_IMAGE = "debian-13"
-export const VM_LOCATION = "ash" # Ashburn, VA
+export const VM_LOCATION = "nbg1" # Nuremburg, Germany
 
 export const VOLUME_SIZE_GiB = 10
 export const VOLUME_FS = "ext4"
