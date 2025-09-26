@@ -1,5 +1,5 @@
 export module ./commands/prune.nu
-export module ./commands/start-session.nu
+export module ./commands/start-session/
 
 export def main []: nothing -> nothing {
 	print "Subcommands: "

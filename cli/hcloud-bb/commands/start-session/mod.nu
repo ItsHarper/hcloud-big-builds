@@ -1,6 +1,6 @@
-use ../util/hcloud-bb-constants.nu *
-use ../util/hcloud-context-management.nu *
-use ../util/hcloud-wrapper.nu *
+use ../../util/hcloud-bb-constants.nu *
+use ../../util/hcloud-context-management.nu *
+use ../../util/hcloud-wrapper.nu *
 
 # TODO(Harper): Set up pruning system
 #
@@ -26,6 +26,8 @@ use ../util/hcloud-wrapper.nu *
 # TODO(Harper): Set up independent monitoring for pruning system
 #
 
+const SCRIPT_DIR = path self .
+
 export def main []: nothing -> string {
 	set-up-hcloud-context
 
@@ -41,12 +43,12 @@ export def main []: nothing -> string {
 		)
 
 		let volumeLinuxDevice = $volumeInfo.volume.linux_device
-		let cloudConfig = $'
-#cloud-config
-
-mounts:
-- [($volumeLinuxDevice), ($BUILD_DIR_MOUNTPOINT), ($VOLUME_FS), "discard,defaults", "0", "2"]
-'
+		let cloudConfig: string = (
+			open --raw ($SCRIPT_DIR)/cloud-init.tmpl.yml
+			| str replace "{{{buildVolumeDevicePath}}}" $volumeLinuxDevice
+			| str replace "{{{buildVolumeMountpoint}}}" $BUILD_DIR_MOUNTPOINT
+			| str replace "{{{buildVolumeFs}}}" $VOLUME_FS
+		)
 
 		print "Creating VM"
 		let vmInfo = (

@@ -1,0 +1,4 @@
+#cloud-config
+
+mounts:
+- [ "{{{buildVolumeDevicePath}}}", "{{{buildVolumeMountpoint}}}", "{{{buildVolumeFs}}}", "discard,defaults", "0", "2"]
