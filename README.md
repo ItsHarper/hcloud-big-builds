@@ -36,6 +36,13 @@ a great fit.
 
 ## TODO
 
+* Security
+	* Firewall that disallows all incoming traffic (the goal is to not need SSH)
+	* VM setup is performed by something like cloud-init
+		* Create unprivileged user
+		* Mount build-root
+		* Disable SSH
+		* Set container to auto-run (track if build environment setup has been performed in root-only file)
 * Use containers for everything not entirely tied to hcloud-bb
 	* User provides build container and setup container
 	* When setup container fails, volume is marked as not-for-use (but kept for a period of time to allow troubleshooting)
