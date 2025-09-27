@@ -69,6 +69,11 @@ export def main []: nothing -> string {
 
 	try {
 		print "Initializing build environment"
+
+		# software-properties-common is needed for add-apt-repository
+		# apt-get -y install software-properties-common
+		# add-apt-repository --component contrib
+
 		# TODO(Harper): Run build environment initialization without capturing output
 	} catch {|e|
 		print -e "Failed to initialize build environment:"
