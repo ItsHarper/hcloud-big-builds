@@ -2,3 +2,9 @@
 
 mounts:
 - [ "{{{buildVolumeDevicePath}}}", "{{{buildVolumeMountpoint}}}", "{{{buildVolumeFs}}}", "discard,defaults", "0", "2"]
+
+# The scripts we run via SSH will also update packages, but we don't bother with reboots in that context, so
+# it's important that we at least get a full update and reboot on first boot.
+package_update: true
+package_upgrade: true
+package_reboot_if_required: true
