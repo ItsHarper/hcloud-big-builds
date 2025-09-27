@@ -48,6 +48,7 @@ export def main []: nothing -> string {
 			| str replace "{{{buildVolumeDevicePath}}}" $volumeLinuxDevice
 			| str replace "{{{buildVolumeMountpoint}}}" $BUILD_DIR_MOUNTPOINT
 			| str replace "{{{buildVolumeFs}}}" $VOLUME_FS
+			| str replace "{{{username}}}" $VM_USERNAME
 		)
 
 		print "Creating VM"
@@ -56,6 +57,8 @@ export def main []: nothing -> string {
 			| hcloud server create --user-data-from-file - --name $resourcesName --volume $resourcesName --type $VM_TYPE --image $VM_IMAGE --location $VM_LOCATION --output "json"
 			| from json
 		)
+
+		# TODO(Harper): Use rsync to install scripts on the VM
 
 		null
 	} catch {|e|
