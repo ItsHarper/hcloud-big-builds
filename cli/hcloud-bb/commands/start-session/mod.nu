@@ -1,4 +1,4 @@
-use ../../util/hcloud-bb-constants.nu *
+use ../../util/cli-constants.nu *
 use ../../util/hcloud-context-management.nu *
 use ../../util/hcloud-wrapper.nu *
 

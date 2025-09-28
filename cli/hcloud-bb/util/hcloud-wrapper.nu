@@ -1,4 +1,4 @@
-use ./hcloud-bb-constants.nu *
+use ./cli-constants.nu *
 
 const HCLOUD_VERSION = "1.52.0"
 

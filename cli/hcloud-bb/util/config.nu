@@ -1,4 +1,4 @@
-use ./hcloud-bb-constants.nu *
+use ./cli-constants.nu *
 use ./hcloud-wrapper.nu *
 
 # Get the name of the local SSH key for the context (key names have to be unique to the whole Hetzner Cloud project)

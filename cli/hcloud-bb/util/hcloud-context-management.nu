@@ -1,5 +1,5 @@
 use ./config.nu *
-use ./hcloud-bb-constants.nu *
+use ./cli-constants.nu *
 use ./hcloud-wrapper.nu *
 
 export def set-up-hcloud-context []: nothing -> nothing {
