@@ -1,9 +1,9 @@
 use std-rfc/iter
-use ../../../common/graphene-constants.nu *
-use ../../../common/debian.nu *
-use ../../../common/google-cloud.nu *
-use ../../../common/mount.nu *
-use ../../../common/sync.nu *
+use ../common/graphene-constants.nu *
+use ($GRAPHENE_COMMON_DIR)/debian.nu *
+use ($GRAPHENE_COMMON_DIR)/google-cloud.nu *
+use ($GRAPHENE_COMMON_DIR)/mount.nu *
+use ($GRAPHENE_COMMON_DIR)/sync.nu *
 
 export def main []: nothing -> nothing {
 	print ""
