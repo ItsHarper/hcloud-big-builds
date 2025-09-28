@@ -4,7 +4,8 @@ use ./hcloud-wrapper.nu *
 
 export def set-up-hcloud-context []: nothing -> nothing {
 	let desiredContext = $CONTEXT_NAME
-	let sshKeysDir = "~/.ssh" | path expand
+	# Our VMs are ephemeral, so the SSH keys to log into them are considered state, not configuration
+	let sshKeysDir = (get-state-dir)/hcloud-ssh-keys
 	let sshKeyName = get-local-ssh-key-name $desiredContext
 	let sshKeyPath = ($sshKeysDir)/($sshKeyName)
 
