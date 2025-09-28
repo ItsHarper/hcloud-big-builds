@@ -4,11 +4,11 @@ mounts:
     - [ "{{{buildVolumeDevicePath}}}", "{{{buildVolumeMountpoint}}}", "{{{buildVolumeFs}}}", "discard,defaults", "0", "2"]
 
 users:
-    - name: "{{username}}"
+    - name: "{{{username}}}"
       # Only allow sudo to be used to run apt-get and add-apt-repository
       sudo:
-          - "%{{username}} ALL=NOPASSWD:/usr/bin/apt-get"
-          - "%{{username}} ALL=NOPASSWD:/usr/bin/add-apt-repository"
+          - "%{{{username}}} ALL=NOPASSWD:/usr/bin/apt-get"
+          - "%{{{username}}} ALL=NOPASSWD:/usr/bin/add-apt-repository"
 
 # The scripts we run via SSH will also update packages, but we don't bother with reboots in that context, so
 # it's important that we at least get a full update and reboot on first boot.

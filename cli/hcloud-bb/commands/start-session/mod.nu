@@ -45,11 +45,17 @@ export def main []: nothing -> string {
 		let volumeLinuxDevice = $volumeInfo.volume.linux_device
 		let cloudConfig: string = (
 			open --raw ($SCRIPT_DIR)/cloud-init.tmpl.yml
-			| str replace "{{{buildVolumeDevicePath}}}" $volumeLinuxDevice
-			| str replace "{{{buildVolumeMountpoint}}}" $BUILD_DIR_MOUNTPOINT
-			| str replace "{{{buildVolumeFs}}}" $VOLUME_FS
-			| str replace "{{{username}}}" $VM_USERNAME
+			| str replace --all "{{{buildVolumeDevicePath}}}" $volumeLinuxDevice
+			| str replace --all "{{{buildVolumeMountpoint}}}" $BUILD_DIR_MOUNTPOINT
+			| str replace --all "{{{buildVolumeFs}}}" $VOLUME_FS
+			| str replace --all "{{{username}}}" $VM_USERNAME
 		)
+
+		if $cloudConfig =~ "{{" { # Intentionally has just two braces for broader mistake detection
+			print "cloud-init config (contains at least one variable that was not replaced):"
+			print $cloudConfig
+			error make { msg: "At least one variable was not replaced in cloud-init config (printed in full above)" }
+		}
 
 		print "Creating VM"
 		let vmInfo = (
