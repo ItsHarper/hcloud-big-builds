@@ -1,6 +1,6 @@
 use ../../util/cli-constants.nu *
-use ../../util/ssh.nu *
-use ../../util/state.nu *
+use ($CLI_UTIL_DIR)/ssh.nu *
+use ($CLI_UTIL_DIR)/state.nu *
 
 # Accepts sessionId as either input or argument
 # (the argument takes priority if both are provided)

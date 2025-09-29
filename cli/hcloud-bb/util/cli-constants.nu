@@ -13,6 +13,7 @@ export const VOLUME_SIZE_GiB = 10
 export const VOLUME_FS = "ext4"
 
 # Other
+export const CLI_UTIL_DIR = path self .
 export const HCLOUD_CONFIG_FILENAME = "hcloud-cli.toml"
 export const CONFIG_DIR_GITIGNORE_CONTENTS = $"
 # Contains references to local-only SSH keys and potentially even actual credentials

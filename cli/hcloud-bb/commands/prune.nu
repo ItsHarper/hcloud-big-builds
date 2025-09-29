@@ -1,7 +1,7 @@
 use ../util/cli-constants.nu *
-use ../util/hcloud-context-management.nu *
-use ../util/hcloud-wrapper.nu *
-use ../util/state.nu *
+use ($CLI_UTIL_DIR)/hcloud-context-management.nu *
+use ($CLI_UTIL_DIR)/hcloud-wrapper.nu *
+use ($CLI_UTIL_DIR)/state.nu *
 
 # TODO(Harper): Check which resources need to be kept
 # TODO(Harper): Prune known_hosts for deleted sessions (do not clear unilaterally)
