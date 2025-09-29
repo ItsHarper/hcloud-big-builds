@@ -1,8 +1,8 @@
-use ../../../util/cli-constants.nu *
-use ../../../util/hcloud-context-management.nu *
-use ../../../util/hcloud-wrapper.nu *
-use ../../../util/ssh.nu *
-use ../../../util/state.nu *
+use ../../util/cli-constants.nu *
+use ../../util/hcloud-context-management.nu *
+use ../../util/hcloud-wrapper.nu *
+use ../../util/ssh.nu *
+use ../../util/state.nu *
 
 const SCRIPT_DIR = path self .
 

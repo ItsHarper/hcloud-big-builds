@@ -1,7 +1,7 @@
-use ../../../util/cli-constants.nu *
-use ../../../util/hcloud-context-management.nu *
-use ../../../util/hcloud-wrapper.nu *
-use ../../../util/state.nu *
+use ../../util/cli-constants.nu *
+use ../../util/hcloud-context-management.nu *
+use ../../util/hcloud-wrapper.nu *
+use ../../util/state.nu *
 
 # TODO(Harper): Set up pruning system
 #

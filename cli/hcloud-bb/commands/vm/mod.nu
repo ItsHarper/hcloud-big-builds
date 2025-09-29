@@ -1,4 +1,4 @@
-export module ./create/
+export module ./create.nu
 
 export def main []: nothing -> nothing {
 	print "Subcommands: "
