@@ -1,8 +1,11 @@
+use std/assert
+use std-rfc/iter
 use ../../util/cli-constants.nu *
 use ($CLI_UTIL_DIR)/hcloud-context-management.nu *
 use ($CLI_UTIL_DIR)/hcloud-wrapper.nu *
 use ($CLI_UTIL_DIR)/ssh.nu *
 use ($CLI_UTIL_DIR)/state.nu *
+use ($CLI_COMMANDS_DIR)/vm/list.nu
 
 const SCRIPT_DIR = path self .
 
@@ -11,21 +14,43 @@ const SCRIPT_DIR = path self .
 export def main [sessionId?: string]: oneof<string, nothing> -> string {
 	let sessionIdFromInput = $in
 	let sessionId: string = $sessionId | default $sessionIdFromInput
-
-	if $sessionId == null {
-		error make { msg: "You must provide the session ID" }
-	}
+	if $sessionId == null { error make { msg: "You must provide a session ID" } }
 
 	set-up-hcloud-context
 
 	let session = get-session $sessionId
 	let resourcesName = $session.resourcesName
+
+	let sessionVms = (
+		list
+		| where name == $resourcesName
+	)
+	if ($sessionVms | length) == 0 {
+		create-vm $session
+	} else {
+		let vm = ($sessionVms | iter only)
+		let status = $vm.status
+		if $status == "off" {
+			print "Starting existing VM"
+			hcloud server poweron $resourcesName
+		} else if $status == "running" {
+			print "VM already started"
+		} else {
+			error make { msg: $"Unrecognized VM status: ($status)" }
+		}
+	}
+
+	$sessionId
+}
+
+def create-vm [session: record]: nothing -> nothing {
+	print "Creating and starting VM"
+
+	let resourcesName = $session.resourcesName
 	let volumeDevPath = $session.volumeDevPath
 	let ipv4Address = $session.ipv4Address
-
 	let cloudInitConfig = generate-cloud-init-config $session
 
-	print "Creating VM"
 	let vmInfo = (
 		$cloudInitConfig
 		| to yaml
@@ -34,8 +59,6 @@ export def main [sessionId?: string]: oneof<string, nothing> -> string {
 		| from json
 		| get server
 	)
-
-	$sessionId
 }
 
 def generate-cloud-init-config [session: record<volumeDevPath: string>]: nothing -> record {

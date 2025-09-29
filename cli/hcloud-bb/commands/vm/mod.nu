@@ -1,6 +1,6 @@
-export module ./create.nu
 export module ./list.nu
 export module ./shell.nu
+export module ./start.nu
 
 export def main []: nothing -> nothing {
 	print "hcloud-bb vm\n"
@@ -11,9 +11,9 @@ export def main []: nothing -> nothing {
 
 	print "Subcommands: "
 	[
-		"create"
 		"list"
 		"shell"
+		"start"
 	]
 	| each { print $"  hcloud-bb vm ($in)"}
 	| ignore

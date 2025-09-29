@@ -7,5 +7,6 @@ use ($CLI_UTIL_DIR)/state.nu *
 export def main [sessionId?: string]: oneof<string, nothing> -> nothing {
 	let sessionIdFromInput = $in
 	let sessionId: string = $sessionId | default $sessionIdFromInput
+	if $sessionId == null { error make { msg: "You must provide a session ID" } }
 	ssh-into-session-vm $sessionId
 }
