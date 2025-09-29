@@ -2,6 +2,7 @@ use ../../util/cli-constants.nu *
 use ($CLI_UTIL_DIR)/hcloud-context-management.nu *
 use ($CLI_UTIL_DIR)/hcloud-wrapper.nu *
 use ($CLI_UTIL_DIR)/state.nu *
+use ($CLI_COMMANDS_DIR)/vm
 
 # TODO(Harper): Set up pruning system
 #
@@ -73,11 +74,11 @@ export def main []: nothing -> record {
 	let ipv4Info = $ipResponse.body.primary_ip
 
 	let session = save-session $sessionId $resourcesName $volumeInfo.volume.linux_device $ipv4Info.ip
-
+	vm start $sessionId
 	print $"Created session ($sessionId)"
 
 	$session
 }
 
-# For pruning system:
+# TODO(Harper): For pruning system:
 # print -e "ERROR: Failed to destroy VM. You are leaking money."
