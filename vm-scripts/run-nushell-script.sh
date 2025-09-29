@@ -21,4 +21,4 @@ if [[ ! -f $NU_PATH ]] || [[ "$($NU_PATH --version)" != "$NU_VERSION" ]]; then
 fi
 
 echo "Running $1"
-"$NU_BIN_DIR/nu" $1
+"$NU_BIN_DIR/nu" "$SCRIPT_DIR/$1"

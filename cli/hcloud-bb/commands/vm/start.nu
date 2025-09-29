@@ -1,6 +1,7 @@
 use std/assert
 use std-rfc/iter
 use ../../util/cli-constants.nu *
+use ($COMMON_CONSTANTS_PATH) *
 use ($CLI_UTIL_DIR)/hcloud-context-management.nu *
 use ($CLI_UTIL_DIR)/hcloud-wrapper.nu *
 use ($CLI_UTIL_DIR)/ssh.nu *
@@ -70,9 +71,8 @@ def generate-cloud-init-config [session: record<volumeDevPath: string>]: nothing
 				shell: "/bin/bash"
 				ssh_authorized_keys: $sshKeys.clientPublicKey
 				sudo: [
-					# Only allow sudo to be used to run apt-get and add-apt-repository
+					# Only allow sudo to be used to run apt-get
 					$"ALL=\(ALL\) NOPASSWD:/usr/bin/apt-get"
-					$"ALL=\(ALL\) NOPASSWD:/usr/bin/add-apt-repository"
 				]
 			}
 		]
@@ -107,17 +107,15 @@ AllowAgentForwarding no
 "
 			}
 		]
+		runcmd: [
+			[ "chmod" "777" $BUILD_ROOT_VM_DIR ]
+		]
 	}
 }
 
 # # For build commands:
-# TODO(Harper): Use rsync to install scripts on the VM
 # try {
 # 	print "Initializing build environment"
-
-# 	# software-properties-common is needed for add-apt-repository
-# 	# apt-get -y install software-properties-common
-# 	# add-apt-repository --component contrib
 
 # 	# TODO(Harper): Run build environment initialization without capturing output
 # } catch {|e|

@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 yarnpkg install --cwd vendor/adevtool/
 source build/envsetup.sh

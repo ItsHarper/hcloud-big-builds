@@ -1,4 +1,5 @@
 use ./cli-constants.nu *
+use ($COMMON_CONSTANTS_PATH) *
 use ./state.nu *
 
 export const SSH_KEY_TYPE = "ed25519"
@@ -32,10 +33,10 @@ export def get-ssh-keys-for-vm-creation [
 	}
 }
 
-export def --wrapped ssh-into-session-vm [sessionId: string, ...rest]: nothing -> any {
+export def --wrapped ssh-into-session-vm [--command: string, sessionId: string, ...rest]: nothing -> any {
 	let session = get-session $sessionId
 	let ip = $session.ipv4Address
-	ssh ...(get-common-ssh-options $session) $"($VM_USERNAME)@($ip)"
+	ssh ...(get-common-ssh-options $session) $"($VM_USERNAME)@($ip)" ($command | default "")
 }
 
 export def rsync-to-session-vm [src: string, dest: string, sessionId: string]: nothing -> nothing {

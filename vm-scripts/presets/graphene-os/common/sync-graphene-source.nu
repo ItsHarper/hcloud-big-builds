@@ -1,11 +1,12 @@
 use ./graphene-constants.nu *
+use ($COMMON_CONSTANTS_PATH) *
 
-export def sync-source [buildDir: string]: nothing -> nothing {
-	cd $buildDir
+export def main []: nothing -> nothing {
+	cd $BUILD_ROOT_VM_DIR
 
 	timeit {
 		if $DOWNLOAD_STABLE {
-			print $"Initializing ($buildDir) for stable tag ($STABLE_TAG)"
+			print $"Initializing build dir for stable tag ($STABLE_TAG)"
 			repo init -u https://github.com/GrapheneOS/platform_manifest.git -b refs/tags/($STABLE_TAG)
 			mkdir ~/.ssh
 			curl https://grapheneos.org/allowed_signers | save -f ~/.ssh/grapheneos_allowed_signers
@@ -15,7 +16,7 @@ export def sync-source [buildDir: string]: nothing -> nothing {
 			cd ../..
 			null
 		} else {
-			print $"Initializing ($buildDir) for dev branch ($DEV_BRANCH)"
+			print $"Initializing build dir for dev branch ($DEV_BRANCH)"
 			repo init -u https://github.com/GrapheneOS/platform_manifest.git -b $DEV_BRANCH
 			null
 		}
@@ -23,9 +24,9 @@ export def sync-source [buildDir: string]: nothing -> nothing {
 	| format duration min
 	| print $"repo initialization took ($in)"
 
-	let threads = (
+	let threads: int = (
 		[
-			sys cpu | length
+			(sys cpu | length)
 			8
 		]
 		| math min
@@ -35,7 +36,7 @@ export def sync-source [buildDir: string]: nothing -> nothing {
 	print $"Syncing source code with ($threads) threads"
 	print "-------------------"
 	timeit {
-		repo sync -j8 --force-sync --verbose out>sync-log.txt
+		repo sync -j($threads) --force-sync --verbose out> sync-log.txt
 	}
 	| format duration min
 	| print $"repo sync took ($in)"

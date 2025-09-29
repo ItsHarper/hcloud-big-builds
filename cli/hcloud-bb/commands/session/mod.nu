@@ -1,4 +1,5 @@
 export module ./create.nu
+export module ./prepare-build-root.nu
 
 export def main []: nothing -> nothing {
 	print "hcloud-bb vm\n"
@@ -8,6 +9,7 @@ export def main []: nothing -> nothing {
 	print "Subcommands: "
 	[
 		"create"
+		"prepare-build-root"
 	]
 	| each { print $"  hcloud-bb session ($in)"}
 	| ignore

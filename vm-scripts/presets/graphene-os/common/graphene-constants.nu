@@ -8,4 +8,6 @@ export const PIXEL_DEVICES_TO_BUILD = [
 
 # Other
 export const GRAPHENE_COMMON_DIR = path self .
-export const INITIAL_SETUP_COMPLETED_FILENAME = ".initial-setup-completed"
+export const COMMON_CONSTANTS_PATH = path self ../../../../common/common-constants.nu
+
+use ($COMMON_CONSTANTS_PATH) *

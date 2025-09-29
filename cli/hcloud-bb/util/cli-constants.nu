@@ -7,7 +7,6 @@ export const VM_TYPE = "cpx11"
 export const VM_IMAGE = "debian-13"
 export const VM_LOCATION = "nbg1" # Nuremburg, Germany
 export const VM_DATACENTER = $"($VM_LOCATION)-dc3" # Use `hcloud datacenter list`
-export const VM_USERNAME = "builder"
 
 export const VOLUME_SIZE_GiB = 10
 export const VOLUME_FS = "ext4"
@@ -15,14 +14,12 @@ export const VOLUME_FS = "ext4"
 # Other
 export const CLI_UTIL_DIR = path self .
 export const CLI_COMMANDS_DIR = path self ../commands
+export const COMMON_CONSTANTS_PATH = path self ../../../common/common-constants.nu
 export const HCLOUD_CONFIG_FILENAME = "hcloud-cli.toml"
 export const CONFIG_DIR_GITIGNORE_CONTENTS = $"
 # Contains references to local-only SSH keys and potentially even actual credentials
 ($HCLOUD_CONFIG_FILENAME)
 "
-
-export const BUILD_ROOT_VM_DIR = "/mnt/build-root"
-export const HCLOUD_BB_VM_DIR = $"/home/($VM_USERNAME)/hcloud-bb"
 
 export def get-config-dir []: nothing -> string {
 	let result = (
