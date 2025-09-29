@@ -25,22 +25,15 @@ export def main [sessionId?: string]: oneof<string, nothing> -> string {
 
 	let cloudInitConfig = generate-cloud-init-config $session
 
-	print ($cloudInitConfig | table --expand)
-	print "\n\n\n"
-	print ($cloudInitConfig | to yaml)
-
 	print "Creating VM"
 	let vmInfo = (
 		$cloudInitConfig
 		| to yaml
 		| $"#cloud-config\n\n($in)"
-		| hcloud server create --user-data-from-file - --name $resourcesName --volume $resourcesName --primary-ipv4 $resourcesName --type $VM_TYPE --image $VM_IMAGE --datacenter $VM_DATACENTER --output "json"
+		| hcloud server create --user-data-from-file - --name $resourcesName --volume $resourcesName --primary-ipv4 $resourcesName --type $VM_TYPE --image $VM_IMAGE --datacenter $VM_DATACENTER --quiet --output "json"
 		| from json
 		| get server
 	)
-
-	print ($vmInfo | table --expand)
-	print $"IP address ($vmInfo.public_net.ipv4.ip)"
 
 	$sessionId
 }

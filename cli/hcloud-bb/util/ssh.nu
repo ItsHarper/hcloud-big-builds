@@ -19,9 +19,8 @@ export def get-ssh-keys-for-vm-creation [
 		ssh-keygen -q -t $SSH_KEY_TYPE -N "" -f $hostPrivateKeyPath
 		ssh-keygen -q -t $SSH_KEY_TYPE -N "" -f $clientPrivateKeyPath
 
-		print "Removing old known_hosts entry (if necessary)"
-		ssh-keygen -R $session.ipv4Address err> /dev/null
-		print "Adding new known_hosts entry"
+		print "Adding/updating known_hosts entry"
+		ssh-keygen -q -R $session.ipv4Address err> /dev/null
 		$"($session.ipv4Address) (open --raw $hostPublicKeyPath | str trim)\n"
 		| save --append ~/.ssh/known_hosts
 	}
@@ -37,6 +36,7 @@ export def --wrapped ssh-into-session-vm [sessionId: string, ...rest]: nothing -
 	let session = get-session $sessionId
 	let clientPrivateKeyPath = ($session.sshKeysDir)/client
 	let ip = $session.ipv4Address
+	print "Connecting to VM"
 	wait-for-vm-ping $ip
 	ssh -oStrictHostKeyChecking=yes -o IdentitiesOnly=yes -i $clientPrivateKeyPath ...$rest ($VM_USERNAME)@($ip)
 }

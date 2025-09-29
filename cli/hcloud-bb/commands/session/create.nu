@@ -38,7 +38,7 @@ export def main []: nothing -> record {
 	# TODO(Harper): Determine whether the hcloud docs actually mean "GB" or if they really mean "GiB"
 	print "Creating volume"
 	let volumeInfo: record = (
-		hcloud volume create --name $resourcesName --size $VOLUME_SIZE_GiB --format $VOLUME_FS --location $VM_LOCATION --output "json"
+		hcloud volume create --name $resourcesName --size $VOLUME_SIZE_GiB --format $VOLUME_FS --location $VM_LOCATION --quiet --output "json"
 		| from json
 	)
 
