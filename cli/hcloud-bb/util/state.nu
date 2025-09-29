@@ -5,50 +5,48 @@ export def save-session [
 	id: string
 	resourcesName: string
 	volumeDevPath: string
-]: nothing -> nothing {
-	let sessionsPath = $"(get-data-dir)/sessions.json"
+	ipv4Address: string
+]: nothing -> record<id: string, resourcesName: string, volumeDevPath: string, ipv4Address: string, sshKeysDir: string> {
+	let sessionsPath = (get-sessions-path)
+	let sshKeysDir = (get-ssh-keys-root-dir)/($id)
+	let session = {
+		id: $id
+		resourcesName: $resourcesName
+		volumeDevPath: $volumeDevPath
+		ipv4Address: $ipv4Address
+		sshKeysDir: $sshKeysDir
+	}
+
+	mkdir $sshKeysDir
 	touch $sessionsPath
 	open $sessionsPath
 	| default {}
-	| upsert $id {
-		resourcesName: $resourcesName
-		volumeDevPath: $volumeDevPath
-	}
+	| upsert $id $session
 	| collect
 	| save -f $sessionsPath
+
+	$session
 }
 
-export def get-session [id: string]: nothing -> record {
-	let sessionsPath = $"(get-data-dir)/sessions.json"
-	open $sessionsPath
+export def get-session [id: string]: nothing -> record<id: string, resourcesName: string, volumeDevPath: string, ipv4Address: string, sshKeysDir: string> {
+	open (get-sessions-path)
 	| get $id
 }
 
-# Get the name of the local SSH key for the context (key names have to be unique to the whole Hetzner Cloud project)
-export def get-local-ssh-key-name [contextName: string]: nothing -> string {
-	let localKeyNamesPath = $"(get-state-dir)/local-ssh-key-names.json"
-	if not ($localKeyNamesPath | path exists) {
-		"{}" | save $localKeyNamesPath
-	}
+export def clear-sessions []: nothing -> nothing {
+	{} | save -f (get-sessions-path)
 
-	let localKeyNames: record = open $localKeyNamesPath
-	let localKeyName: oneof<string, nothing> = (
-		$localKeyNames
-		| get ([{ value: $contextName, optional: true }] | into cell-path)
-	)
+	let sshKeysRootDir = (get-ssh-keys-root-dir)
+	mkdir $sshKeysRootDir
+	ls $sshKeysRootDir
+	| get name
+	| each {|path| rm -r $path}
+}
 
-	return (
-		if $localKeyName == null {
-			let localKeyName = $"($contextName)-(random chars --length 7)"
+def get-sessions-path []: nothing -> string {
+	(get-data-dir)/sessions.json
+}
 
-			$localKeyNames
-			| insert $contextName $localKeyName
-			| to json --indent 2
-			| save -f $localKeyNamesPath
-
-			$localKeyName
-		} else {
-			$localKeyName
-		}
-	)
+def get-ssh-keys-root-dir []: nothing -> string {
+	(get-data-dir)/ssh-keys
 }

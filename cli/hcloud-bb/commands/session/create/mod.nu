@@ -29,7 +29,7 @@ use ../../../util/state.nu *
 
 const SCRIPT_DIR = path self .
 
-export def main []: nothing -> string {
+export def main []: nothing -> record {
 	set-up-hcloud-context
 
 	let sessionId = random chars --length 7
@@ -42,13 +42,41 @@ export def main []: nothing -> string {
 		| from json
 	)
 
-	# TODO(Harper): Reserve and store IP address
+	print "Creating IPv4 address"
+	# TODO(Harper): Switch back to hcloud cli once they fix this command
+	# let ipv4Info: record = (
+	# 	hcloud primary-ip create --name $resourcesName --datacenter $VM_DATACENTER --type ipv4 --auto-delete=false
+	# 	| from json
+	# )
 
-	save-session $sessionId $resourcesName $volumeInfo.volume.linux_device
+	let token: string = (
+		open (get-config-dir)/($HCLOUD_CONFIG_FILENAME)
+		| get contexts
+		| iter only
+		| get token
+	)
+	let ipResponse = (
+		{
+			name: $resourcesName
+			type: "ipv4"
+			datacenter: "nbg1-dc3"
+			assignee_type: "server"
+			auto_delete: false
+		}
+		| http post --allow-errors --full --headers { Authorization: $"Bearer ($token)" } --content-type application/json "https://api.hetzner.cloud/v1/primary_ips"
+	)
+	if $ipResponse.status < 200 or $ipResponse.status >= 300 {
+		print -e "Full IP creation response:"
+		print -e ($ipResponse | table --expand)
+		error make { msg: $"Server responded with error code ($ipResponse.status)" }
+	}
+	let ipv4Info = $ipResponse.body.primary_ip
+
+	let session = save-session $sessionId $resourcesName $volumeInfo.volume.linux_device $ipv4Info.ip
 
 	print $"Created session ($sessionId)"
 
-	$sessionId
+	$session
 }
 
 # For pruning system:
