@@ -34,16 +34,30 @@ export def get-ssh-keys-for-vm-creation [
 
 export def --wrapped ssh-into-session-vm [sessionId: string, ...rest]: nothing -> any {
 	let session = get-session $sessionId
-	let clientPrivateKeyPath = ($session.sshKeysDir)/client
 	let ip = $session.ipv4Address
-	print "Connecting to VM"
-	wait-for-vm-ping $ip
-	ssh -oStrictHostKeyChecking=yes -o IdentitiesOnly=yes -i $clientPrivateKeyPath ...$rest ($VM_USERNAME)@($ip)
+	ssh ...(get-common-ssh-options $session) $"($VM_USERNAME)@($ip)"
 }
 
-def wait-for-vm-ping [ipAddress: string]: nothing -> nothing {
+export def rsync-to-session-vm [src: string, dest: string, sessionId: string]: nothing -> nothing {
+	let session = (get-session $sessionId)
+	let ip = $session.ipv4Address
+	rsync --recursive --perms --rsh $"ssh ((get-common-ssh-options $session) | str join ' ')" $src ($VM_USERNAME)@($ip):($dest)
+}
+
+def get-common-ssh-options [session: record]: nothing -> list<string> {
+	[
+		[ "-o", "StrictHostKeyChecking=yes" ]
+		[ "-o", "IdentitiesOnly=yes" ]
+		[ "-i", $"($session.sshKeysDir)/client" ]
+	]
+	| flatten
+}
+
+export def wait-for-vm-ping [ipAddress: string]: nothing -> nothing {
 	let startTime = date now
 	let timeoutDuration = 2min
+
+	print "Connecting to VM"
 	mut pingSucceeded = ping $ipAddress
 
 	if not $pingSucceeded {

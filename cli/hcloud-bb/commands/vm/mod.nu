@@ -1,6 +1,7 @@
 export module ./list.nu
 export module ./shell.nu
 export module ./start.nu
+export module ./sync-scripts.nu
 
 export def main []: nothing -> nothing {
 	print "hcloud-bb vm\n"
@@ -14,6 +15,7 @@ export def main []: nothing -> nothing {
 		"list"
 		"shell"
 		"start"
+		"sync-scripts"
 	]
 	| each { print $"  hcloud-bb vm ($in)"}
 	| ignore

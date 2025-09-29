@@ -79,7 +79,7 @@ def generate-cloud-init-config [session: record<volumeDevPath: string>]: nothing
 		mounts: [
 			[
 				$session.volumeDevPath
-				$BUILD_DIR_MOUNTPOINT
+				$BUILD_ROOT_VM_DIR
 				$VOLUME_FS
 				"discard,defaults"
 				"0"
