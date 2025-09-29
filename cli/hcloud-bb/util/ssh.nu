@@ -33,7 +33,15 @@ export def get-ssh-keys-for-vm-creation [
 	}
 }
 
-export def wait-for-vm-ping [ipAddress: string]: nothing -> nothing {
+export def --wrapped ssh-into-session-vm [sessionId: string, ...rest]: nothing -> any {
+	let session = get-session $sessionId
+	let clientPrivateKeyPath = ($session.sshKeysDir)/client
+	let ip = $session.ipv4Address
+	wait-for-vm-ping $ip
+	ssh -oStrictHostKeyChecking=yes -o IdentitiesOnly=yes -i $clientPrivateKeyPath ...$rest ($VM_USERNAME)@($ip)
+}
+
+def wait-for-vm-ping [ipAddress: string]: nothing -> nothing {
 	let startTime = date now
 	let timeoutDuration = 2min
 	mut pingSucceeded = ping $ipAddress
