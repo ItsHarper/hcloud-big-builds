@@ -13,28 +13,48 @@ export def main []: string -> string {
 	let session = get-session $sessionId
 	let volumeDevPath = $session.volumeDevPath
 	let resourcesName = $session.resourcesName
-	let cloudConfig: string = (
-		open --raw ($SCRIPT_DIR)/cloud-init.tmpl.yml
-		| str replace --all "{{{buildVolumeDevicePath}}}" $volumeDevPath
-		| str replace --all "{{{buildVolumeMountpoint}}}" $BUILD_DIR_MOUNTPOINT
-		| str replace --all "{{{buildVolumeFs}}}" $VOLUME_FS
-		| str replace --all "{{{username}}}" $VM_USERNAME
-	)
 
-	if $cloudConfig =~ "{{" { # Intentionally has just two braces for broader mistake detection
-		print "cloud-init config (contains at least one variable that was not replaced):"
-		print $cloudConfig
-		error make { msg: "At least one variable was not replaced in cloud-init config (printed in full above)" }
-	}
+	let cloudInitConfig = generate-cloud-init-config $session
+
+	print ($cloudInitConfig | table --expand)
+	print "\n\n\n"
+	print ($cloudInitConfig | to yaml)
 
 	print "Creating VM"
 	let vmInfo = (
-		$cloudConfig
+		$cloudInitConfig
+		| to yaml
+		| $"#cloud-config\n\n($in)"
 		| hcloud server create --user-data-from-file - --name $resourcesName --volume $resourcesName --type $VM_TYPE --image $VM_IMAGE --location $VM_LOCATION --output "json"
 		| from json
 	)
 
 	$sessionId
+}
+
+def generate-cloud-init-config [session: record<volumeDevPath: string>]: nothing -> record {
+	{
+		users: [
+			{
+				name: $VM_USERNAME
+				sudo: [
+					# Only allow sudo to be used to run apt-get and add-apt-repository
+					$"($VM_USERNAME) ALL=NOPASSWD:/usr/bin/apt-get"
+					$"($VM_USERNAME) ALL=NOPASSWD:/usr/bin/add-apt-repository"
+				]
+			}
+		]
+		mounts: [
+			[
+				$session.volumeDevPath
+				$BUILD_DIR_MOUNTPOINT
+				$VOLUME_FS
+				"discard,defaults"
+				"0"
+				"2"
+			]
+		]
+	}
 }
 
 # # For build commands:
