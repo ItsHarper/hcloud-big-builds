@@ -12,37 +12,38 @@ export def main []: nothing -> nothing {
 		hcloud server list --output json
 		| from json
 		| default []
+		| update created {|vm| $vm.created | into datetime }
 	)
 	let volumes: table = (
 		hcloud volume list --output json
 		| from json
 		| default []
+		| update created {|volume| $volume.created | into datetime }
 	)
 	let primaryIps: table = (
 		hcloud primary-ip list --output json
 		| from json
 		| default []
+		| update created {|ip| $ip.created | into datetime }
+		# auto_deleted IPs don't need manual cleanup
+		| where auto_delete == false
 	)
 
 	print "VMs to delete:"
 	print (
 		$vms
-		| update created {|vm| $vm.created | into datetime }
 		| select name id status volumes created
 		| table --expand
 	)
 	print "Volumes to delete:"
 	print (
 		$volumes
-		| update created {|volume| $volume.created | into datetime }
 		| select name id status server size format created
 		| table --expand
 	)
 	print "Primary IP addresses to delete:"
 	print (
 		$primaryIps
-		| update created {|ip| $ip.created | into datetime }
-		| where auto_delete == true
 		| select name ip id type assignee_id created
 		| table --expand
 	)
