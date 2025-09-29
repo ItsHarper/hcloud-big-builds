@@ -55,8 +55,8 @@ def generate-cloud-init-config [session: record<volumeDevPath: string>]: nothing
 				ssh_authorized_keys: $sshKeys.clientPublicKey
 				sudo: [
 					# Only allow sudo to be used to run apt-get and add-apt-repository
-					$"($VM_USERNAME) ALL=NOPASSWD:/usr/bin/apt-get"
-					$"($VM_USERNAME) ALL=NOPASSWD:/usr/bin/add-apt-repository"
+					$"ALL=\(ALL\) NOPASSWD:/usr/bin/apt-get"
+					$"ALL=\(ALL\) NOPASSWD:/usr/bin/add-apt-repository"
 				]
 			}
 		]
