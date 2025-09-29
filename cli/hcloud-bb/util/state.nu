@@ -1,6 +1,29 @@
 use ./cli-constants.nu *
 use ./hcloud-wrapper.nu *
 
+export def save-session [
+	id: string
+	resourcesName: string
+	volumeDevPath: string
+]: nothing -> nothing {
+	let sessionsPath = $"(get-data-dir)/sessions.json"
+	touch $sessionsPath
+	open $sessionsPath
+	| default {}
+	| upsert $id {
+		resourcesName: $resourcesName
+		volumeDevPath: $volumeDevPath
+	}
+	| collect
+	| save -f $sessionsPath
+}
+
+export def get-session [id: string]: nothing -> record {
+	let sessionsPath = $"(get-data-dir)/sessions.json"
+	open $sessionsPath
+	| get $id
+}
+
 # Get the name of the local SSH key for the context (key names have to be unique to the whole Hetzner Cloud project)
 export def get-local-ssh-key-name [contextName: string]: nothing -> string {
 	let localKeyNamesPath = $"(get-state-dir)/local-ssh-key-names.json"

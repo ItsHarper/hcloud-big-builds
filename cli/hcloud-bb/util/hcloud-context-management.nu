@@ -1,4 +1,4 @@
-use ./config.nu *
+use ./state.nu *
 use ./cli-constants.nu *
 use ./hcloud-wrapper.nu *
 
