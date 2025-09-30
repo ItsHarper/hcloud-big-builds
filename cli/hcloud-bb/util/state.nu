@@ -15,10 +15,10 @@ export def save-new-session [
 	let session = {
 		id: $id
 		status: $SESSION_STATUS_READY
-		resourcesName: $resourcesName
-		volumeDevPath: $volumeDevPath
 		ipv4Address: $ipv4Address
+		resourcesName: $resourcesName
 		sshKeysDir: $sshKeysDir
+		volumeDevPath: $volumeDevPath
 	}
 
 	mkdir $sshKeysDir
@@ -67,7 +67,7 @@ export def clear-sessions []: nothing -> nothing {
 	| each {|path| rm -r $path}
 }
 
-def get-sessions-path []: nothing -> string {
+export def get-sessions-path []: nothing -> string {
 	(get-data-dir)/sessions.json
 }
 
