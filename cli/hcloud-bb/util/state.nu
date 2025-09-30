@@ -10,7 +10,7 @@ export def save-new-session [
 	resourcesName: string
 	volumeDevPath: string
 	ipv4Address: string
-]: nothing -> record<id: string, status: string, resourcesName: string, volumeDevPath: string, ipv4Address: string, sshKeysDir: string> {
+]: nothing -> nothing {
 	let sessionsPath = (get-sessions-path)
 	let sshKeysDir = (get-ssh-keys-root-dir)/($id)
 	let session = {
@@ -29,8 +29,6 @@ export def save-new-session [
 	| upsert $id $session
 	| collect
 	| save -f $sessionsPath
-
-	$session
 }
 
 export def get-session [id?: string]: nothing -> record<id: string, status: string, resourcesName: string, volumeDevPath: string, ipv4Address: string, sshKeysDir: string> {

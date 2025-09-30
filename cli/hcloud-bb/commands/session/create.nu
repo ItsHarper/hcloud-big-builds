@@ -49,7 +49,7 @@ export def main []: nothing -> record {
 	}
 	let ipv4Info = $ipResponse.body.primary_ip
 
-	let session = save-new-session $sessionId $resourcesName $volumeInfo.volume.linux_device $ipv4Info.ip
+	save-new-session $sessionId $resourcesName $volumeInfo.volume.linux_device $ipv4Info.ip
 
 	try {
 		vm start $sessionId
@@ -60,8 +60,7 @@ export def main []: nothing -> record {
 	}
 
 	print $"Created session ($sessionId)"
-
-	$session
+	get-session $sessionId
 }
 
 # TODO(Harper): For pruning system:
