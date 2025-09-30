@@ -8,7 +8,20 @@ const SYNTHETIC_SESSION_STATUS_ZOMBIE = "ZOMBIE"
 
 export def main []: nothing -> nothing {
 	set-up-hcloud-context
+	let sessions = list sessions
 
+	# Check for VMs that are shut down
+	# A shut-down VM costs just as much as a running one, so we update the status to indicate that we don't need the VM
+	list vms | each {|vm|
+		let session: oneof<record, nothing> = $sessions | where resourcesName == $vm.name | get --optional 0
+		# VMs without sessions are zombies and will get destroyed; we can ignore those
+		if $session != null and $vm.status == "off" and $session.status != $SESSION_STATUS_READY {
+			print $"Marking session ($session.id) as READY \(its VM is shut down\)"
+			update-session-status $session.id $SESSION_STATUS_READY
+		}
+	}
+
+	# Refresh sessions to reflect any changes made in the previous step
 	let sessions = list sessions
 	let vms = list vms | add-session-status-column $sessions
 	let volumes: table = (
