@@ -3,13 +3,7 @@ use ($COMMON_CONSTANTS_PATH) *
 use ($CLI_UTIL_DIR)/ssh.nu *
 use ($CLI_UTIL_DIR)/state.nu *
 
-# Accepts sessionId as either input or argument and passes it through as output
-# (the argument takes priority if both are provided)
-export def main [sessionId?: string]: oneof<nothing, string> -> string {
-	let sessionIdFromInput = $in
-	let sessionId: string = $sessionId | default $sessionIdFromInput
-	if $sessionId == null { error make { msg: "You must provide a session ID" } }
-
+export def main [sessionId: string]: nothing -> string {
 	let session = (get-session $sessionId)
 	wait-for-vm-ping $session.ipv4Address
 
