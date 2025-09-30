@@ -79,8 +79,9 @@ def generate-cloud-init-config [session: record<volumeDevPath: string>]: nothing
 				shell: "/bin/bash"
 				ssh_authorized_keys: $sshKeys.clientPublicKey
 				sudo: [
-					# Only allow sudo to be used to run apt-get
+					# Only allow sudo to be used to run apt-get and shutdown
 					$"ALL=\(ALL\) NOPASSWD:/usr/bin/apt-get"
+					$"ALL=\(ALL\) NOPASSWD:/usr/sbin/shutdown"
 				]
 			}
 		]
