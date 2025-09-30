@@ -3,8 +3,9 @@ use ($CLI_UTIL_DIR)/state.nu *
 use ($CLI_COMMANDS_DIR)/prune.nu
 use ($CLI_COMMANDS_DIR)/vm/verify-active.nu
 
-export def main [--skip-prune sessionId: string]: nothing -> nothing {
+export def main [--skip-prune sessionId?: string]: nothing -> nothing {
 	let session = (get-session $sessionId)
+	let sessionId = $session.id
 	let vmExpectedToBeRunning = ($session.status == $SESSION_STATUS_ACTIVE)
 
 	if $vmExpectedToBeRunning {

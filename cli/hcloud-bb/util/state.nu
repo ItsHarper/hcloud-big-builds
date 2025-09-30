@@ -1,3 +1,4 @@
+use std-rfc/iter
 use ./cli-constants.nu *
 use ./hcloud-wrapper.nu *
 
@@ -32,9 +33,13 @@ export def save-new-session [
 	$session
 }
 
-export def get-session [id: string]: nothing -> record<id: string, status: string, resourcesName: string, volumeDevPath: string, ipv4Address: string, sshKeysDir: string> {
-	open (get-sessions-path)
-	| get $id
+export def get-session [id?: string]: nothing -> record<id: string, status: string, resourcesName: string, volumeDevPath: string, ipv4Address: string, sshKeysDir: string> {
+	let sessions = open (get-sessions-path)
+	if $id == null {
+		$sessions | values | iter only
+	} else {
+		$sessions | get $id
+	}
 }
 
 export def update-session-status [id: string, status: string]: nothing -> nothing {

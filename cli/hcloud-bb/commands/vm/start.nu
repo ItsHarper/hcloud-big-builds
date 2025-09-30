@@ -10,10 +10,11 @@ use ($CLI_COMMANDS_DIR)/list
 
 const SCRIPT_DIR = path self .
 
-export def main [sessionId: string]: nothing -> string {
+export def main [sessionId?: string]: nothing -> string {
 	set-up-hcloud-context
 
 	let session = get-session $sessionId
+	let sessionId: string = $session.id
 	let resourcesName = $session.resourcesName
 	let sessionVms = (
 		list vms
