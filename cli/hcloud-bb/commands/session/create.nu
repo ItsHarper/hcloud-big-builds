@@ -4,30 +4,6 @@ use ($CLI_UTIL_DIR)/hcloud-wrapper.nu *
 use ($CLI_UTIL_DIR)/state.nu *
 use ($CLI_COMMANDS_DIR)/vm
 
-# TODO(Harper): Set up pruning system
-#
-# Instead of performing any cleanup here, merely update the state of the session (before starting to make actual changes). Throw if that fails.
-#
-# The session tracking system will be responsible for creating session IDs, so that collisions can be guaranteed not to occur.
-#
-# `prune` command operates based on the state of the sessions:
-# * starting (keep volume and VM)
-# * initializingBuildEnvironment (keep volume and VM)
-# * building (keep volume and VM)
-# * ready (keep volume only)
-# * buildEnvironmentInitializationFailure (keep volume)
-# * investigatingBuildEnvironmentInitializationFailure (keep volume and VM)
-# * destroyed (keep nothing)
-#
-# Build errors result in the `ready` state, build environment initialization errors result in the
-# `buildEnvironmentInitializationFailure` state, and all other errors result in the `destroyed` state
-#
-# VMs are not deleted until the hour that has been paid for has almost ended (run
-# `server describe` and examine the `created` field)
-
-# TODO(Harper): Set up independent monitoring for pruning system
-#
-
 const SCRIPT_DIR = path self .
 
 export def main []: nothing -> record {
@@ -73,7 +49,7 @@ export def main []: nothing -> record {
 	}
 	let ipv4Info = $ipResponse.body.primary_ip
 
-	let session = save-session $sessionId $resourcesName $volumeInfo.volume.linux_device $ipv4Info.ip
+	let session = save-new-session $sessionId $resourcesName $volumeInfo.volume.linux_device $ipv4Info.ip
 	vm start $sessionId
 	print $"Created session ($sessionId)"
 

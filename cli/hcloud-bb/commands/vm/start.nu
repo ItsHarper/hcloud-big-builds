@@ -15,11 +15,15 @@ export def main [sessionId: string]: nothing -> string {
 
 	let session = get-session $sessionId
 	let resourcesName = $session.resourcesName
-
 	let sessionVms = (
 		list vms
 		| where name == $resourcesName
 	)
+
+	# Make sure the status is set to ACTIVE before we actually start
+	# the VM, so that it can't get pruned
+	update-session-status $sessionId $SESSION_STATUS_ACTIVE
+
 	if ($sessionVms | length) == 0 {
 		create-vm $session
 	} else {

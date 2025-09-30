@@ -71,3 +71,35 @@ export def main []: nothing -> nothing {
 
 	null
 }
+
+# TODO(Harper): Make pruning system more advanced
+#
+# `prune` command operates based on the status of the sessions:
+# * starting (keep volume and VM)
+# * initializingBuildEnvironment (keep volume and VM)
+# * building (keep volume and VM)
+# * ready (keep volume only)
+# * buildEnvironmentInitializationFailure (keep volume)
+# * investigatingBuildEnvironmentInitializationFailure (keep volume and VM)
+# * destroyed (keep nothing)
+#
+# Build errors result in the `ready` status, build environment initialization errors result in the
+# `buildEnvironmentInitializationFailure` status, and all other errors result in the `destroyed` status
+#
+# More granular statuses like this will:
+# * Allow for imperfect error handling
+#   * For example, if a VM fails to be created and the state isn't updated accordingly,
+#     we can detect that a session has been in the `starting` state for way too long
+#     and destroy it
+# * Allow us to accurately update the session status by looking at the VM list
+#   * For example, if a session has been in the `building` status for several minutes,
+#     but does not have a VM running, we can safely downgrade it to the "ready" status
+#
+# Ensure that the state is always updated BEFORE an operation begins
+#
+# VMs are not deleted until the hour that has been paid for has almost ended (run
+# `server describe` and examine the `created` field)
+
+# TODO(Harper): Set up independent monitoring for pruning system
+
+# TODO(Harper): Make the session tracking system responsible for creating session IDs, so that collisions can be guaranteed not to occur.
