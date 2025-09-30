@@ -69,7 +69,7 @@ export def main []: nothing -> record {
 	if $ipResponse.status < 200 or $ipResponse.status >= 300 {
 		print -e "Full IP creation response:"
 		print -e ($ipResponse | table --expand)
-		error make { msg: $"Server responded with error code ($ipResponse.status)" }
+		error make { msg: $"Hetzner responded with error code ($ipResponse.status)" }
 	}
 	let ipv4Info = $ipResponse.body.primary_ip
 
