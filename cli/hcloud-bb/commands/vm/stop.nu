@@ -3,7 +3,7 @@ use ($CLI_UTIL_DIR)/state.nu *
 use ($CLI_COMMANDS_DIR)/prune.nu
 use ($CLI_COMMANDS_DIR)/vm/verify-active.nu
 
-export def main [sessionId: string]: nothing -> nothing {
+export def main [--skip-prune sessionId: string]: nothing -> nothing {
 	let session = (get-session $sessionId)
 	let vmExpectedToBeRunning = ($session.status == $SESSION_STATUS_ACTIVE)
 
@@ -17,6 +17,8 @@ export def main [sessionId: string]: nothing -> nothing {
 	print "Marking session as READY"
 	update-session-status $sessionId $SESSION_STATUS_READY
 
-	print "Running `prune`"
-	prune
+	if not $skip_prune {
+		print "Running `prune`"
+		prune
+	}
 }

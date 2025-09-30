@@ -1,4 +1,5 @@
 export module ./create.nu
+export module ./destroy.nu
 export module ./prepare-build-root.nu
 
 export def main []: nothing -> nothing {
@@ -9,6 +10,7 @@ export def main []: nothing -> nothing {
 	print "Subcommands: "
 	[
 		"create"
+		"destroy"
 		"prepare-build-root"
 	]
 	| each { print $"  hcloud-bb session ($in)"}
