@@ -3,14 +3,16 @@ export const CONTEXT_NAME = "hcloud-bb"
 export const RESOURCES_NAME_PREFIX = $CONTEXT_NAME
 export const TAG_NAME = $CONTEXT_NAME
 
-export const VM_TYPE = "cpx11"
 # TODO(Harper): Verify that Debian 13 doesn't give us issues
 export const VM_IMAGE = "debian-13"
 export const VM_LOCATION = "nbg1" # Nuremburg, Germany
 export const VM_DATACENTER = $"($VM_LOCATION)-dc3" # Use `hcloud datacenter list`
-
-export const VOLUME_SIZE_GiB = 10
 export const VOLUME_FS = "ext4"
+
+# export const VOLUME_SIZE_GiB = 10
+# export const VM_TYPE = "cpx11"
+export const VOLUME_SIZE_GiB = 400
+export const VM_TYPE = "ccx63" # TODO(Harper): Compare costs for different tiers
 
 # Other
 export const CLI_UTIL_DIR = path self .

@@ -1,10 +1,15 @@
 # Settings
 export const DEV_BRANCH = "16"
-export const STABLE_TAG = "2025091000"
+export const STABLE_TAG = "2025092700"
 export const DOWNLOAD_STABLE = true
-export const PIXEL_DEVICES_TO_BUILD = [
-	"oriole" # Pixel 6
+export const BUILD_VARIANT = "userdebug"
+export const PIXEL_BUILD_TARGETS = [
+	# "oriole" # Pixel 6
 	"shiba" # Pixel 8
+]
+export const BUILD_TARGETS = [
+	"sdk_phone64_x86_64" # Emulator
+	...$PIXEL_BUILD_TARGETS
 ]
 
 # Other
