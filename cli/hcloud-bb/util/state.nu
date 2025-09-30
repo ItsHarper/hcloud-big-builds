@@ -55,16 +55,7 @@ export def delete-session [id: string]: nothing -> nothing {
 	| save -f $sessionsPath
 
 	rm -r (get-ssh-keys-root-dir)/($id)
-}
-
-export def clear-sessions []: nothing -> nothing {
-	{} | save -f (get-sessions-path)
-
-	let sshKeysRootDir = (get-ssh-keys-root-dir)
-	mkdir $sshKeysRootDir
-	ls $sshKeysRootDir
-	| get name
-	| each {|path| rm -r $path}
+	# TODO(Harper): Remove known_hosts entry for session
 }
 
 export def get-sessions-path []: nothing -> string {

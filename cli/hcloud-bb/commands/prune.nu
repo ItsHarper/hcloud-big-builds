@@ -4,47 +4,84 @@ use ($CLI_UTIL_DIR)/hcloud-wrapper.nu *
 use ($CLI_UTIL_DIR)/state.nu *
 use ($CLI_COMMANDS_DIR)/list
 
-# TODO(Harper): Check which resources need to be kept
-# TODO(Harper): Prune known_hosts for deleted sessions (do not clear unilaterally)
+const SYNTHETIC_SESSION_STATUS_ZOMBIE = "ZOMBIE"
+
 export def main []: nothing -> nothing {
 	set-up-hcloud-context
 
-	let vms = list vms
+	let sessions = list sessions
+	let vms = list vms | add-session-status-column $sessions
 	let volumes: table = (
 		hcloud volume list --output json
 		| from json
 		| default []
 		| update created {|volume| $volume.created | into datetime }
+		| add-session-status-column $sessions
 	)
 	let primaryIps: table = (
 		hcloud primary-ip list --output json
 		| from json
 		| default []
 		| update created {|ip| $ip.created | into datetime }
-		# auto_deleted IPs don't need manual cleanup
+		| add-session-status-column $sessions
+		# auto-deleted IPs aren't relevant
 		| where auto_delete == false
+	)
+
+	let vmsToDelete = (
+		$vms
+		| where sessionStatus != $SESSION_STATUS_ACTIVE
+	)
+	let volumesToDelete: table = (
+		$volumes
+		| where sessionStatus == $SYNTHETIC_SESSION_STATUS_ZOMBIE
+	)
+	let primaryIpsToDelete: table = (
+		$primaryIps
+		| where sessionStatus == $SYNTHETIC_SESSION_STATUS_ZOMBIE
+	)
+
+	print "VMs:"
+	print (
+		$vms
+		| table --expand
 	)
 
 	print "VMs to delete:"
 	print (
-		$vms
-		| list vms make-friendly
-		| table --expand
-	)
-	print "Volumes to delete:"
-	print (
-		$volumes
-		| select name id status server size format created
-		| table --expand
-	)
-	print "Primary IP addresses to delete:"
-	print (
-		$primaryIps
-		| select name ip id type assignee_id created
+		$vmsToDelete
 		| table --expand
 	)
 
-	$vms
+	print "Volumes:"
+	print (
+		$volumes
+		| select name sessionStatus id status server size format created
+		| table --expand
+	)
+
+	print "Volumes to delete:"
+	print (
+		$volumesToDelete
+		| select name sessionStatus id status server size format created
+		| table --expand
+	)
+
+	print "Primary IP addresses:"
+	print (
+		$primaryIps
+		| select name sessionStatus ip id type assignee_id created
+		| table --expand
+	)
+
+	print "Primary IP addresses to delete:"
+	print (
+		$primaryIpsToDelete
+		| select name sessionStatus ip id type assignee_id created
+		| table --expand
+	)
+
+	$vmsToDelete
 	| each {|vm|
 		if $vm.status == "running" {
 			print $"Powering off VM ($vm.name)"
@@ -55,21 +92,31 @@ export def main []: nothing -> nothing {
 		hcloud server delete $vm.id
 	}
 
-	$volumes
+	$volumesToDelete
 	| each {|volume|
 		print $"Deleting volume ($volume.name)"
 		hcloud volume delete $volume.id
 	}
 
-	$primaryIps
+	$primaryIpsToDelete
 	| each {|ip|
 		print $"Deleting primary IP address ($ip.name) \(($ip.ip)\)"
 		hcloud primary-ip delete $ip.id
 	}
 
-	clear-sessions
-
 	null
+}
+
+# Accepts and returns a table of resources
+def add-session-status-column [sessions: table]: table<name: string> -> table<name: string, sessionStatus: string> {
+	insert sessionStatus {|resource|
+		$sessions
+		| where resourcesName == $resource.name
+		| get status
+		| get --optional 0
+		| default $SYNTHETIC_SESSION_STATUS_ZOMBIE
+	}
+	| move --after name sessionStatus
 }
 
 # TODO(Harper): Make pruning system more advanced
@@ -88,14 +135,14 @@ export def main []: nothing -> nothing {
 #
 # More granular statuses like this will:
 # * Allow for imperfect error handling
-#   * For example, if a VM fails to be created and the state isn't updated accordingly,
-#     we can detect that a session has been in the `starting` state for way too long
+#   * For example, if a VM fails to be created and the status isn't updated accordingly,
+#     we can detect that a session has been in the `starting` status for way too long
 #     and destroy it
 # * Allow us to accurately update the session status by looking at the VM list
 #   * For example, if a session has been in the `building` status for several minutes,
 #     but does not have a VM running, we can safely downgrade it to the "ready" status
 #
-# Ensure that the state is always updated BEFORE an operation begins
+# Ensure that the status is always updated BEFORE an operation begins
 #
 # VMs are not deleted until the hour that has been paid for has almost ended (run
 # `server describe` and examine the `created` field)
