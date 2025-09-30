@@ -1,11 +1,10 @@
 use ../../util/cli-constants.nu *
 use ($COMMON_CONSTANTS_PATH) *
 use ($CLI_UTIL_DIR)/ssh.nu *
-use ($CLI_UTIL_DIR)/state.nu *
+use ($CLI_COMMANDS_DIR)/vm/verify-active.nu
 
 export def main [sessionId: string]: nothing -> string {
-	let session = (get-session $sessionId)
-	wait-for-vm-ping $session.ipv4Address
+	verify-active $sessionId
 
 	print "Syncing scripts to VM"
 	rsync-to-session-vm $TOP_LEVEL_COMMON_DIR $HCLOUD_BB_VM_DIR $sessionId

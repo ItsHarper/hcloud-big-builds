@@ -53,32 +53,3 @@ def get-common-ssh-options [session: record]: nothing -> list<string> {
 	]
 	| flatten
 }
-
-export def wait-for-vm-ping [ipAddress: string]: nothing -> nothing {
-	let startTime = date now
-	let timeoutDuration = 2min
-
-	print "Connecting to VM"
-	mut pingSucceeded = ping $ipAddress
-
-	if not $pingSucceeded {
-		print "Waiting for VM to respond to our pings"
-	}
-
-	while ((not $pingSucceeded) and ((date now) - $startTime) < $timeoutDuration) {
-		sleep 200ms
-		$pingSucceeded = ping $ipAddress
-	}
-
-	if $pingSucceeded {
-		print $"VM responded after (((date now) - $startTime) | format duration sec)"
-	} else {
-		error make { msg: $"Timed out after ($timeoutDuration) of waiting for VM to respond to our pings" }
-	}
-}
-
-def ping [ipAddress: string]: nothing -> bool {
-	^ping -c 1 $ipAddress
-	| complete
-	| $in.exit_code == 0
-}
