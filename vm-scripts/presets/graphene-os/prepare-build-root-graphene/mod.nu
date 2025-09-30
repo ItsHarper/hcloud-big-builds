@@ -18,6 +18,5 @@ export def main []: nothing -> nothing {
 }
 
 def prepare-for-pixel-vendor-files-generation []: nothing -> nothing {
-	cd $BUILD_ROOT_VM_DIR
 	bash $PREPARE_PIXEL_FILES_SCRIPT_PATH
 }
