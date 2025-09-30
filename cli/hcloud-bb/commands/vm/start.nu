@@ -50,6 +50,7 @@ def create-vm [session: record]: nothing -> nothing {
 	let ipv4Address = $session.ipv4Address
 	let cloudInitConfig = generate-cloud-init-config $session
 
+	print "Waiting for VM creation to finish"
 	let vmInfo = (
 		$cloudInitConfig
 		| to yaml
