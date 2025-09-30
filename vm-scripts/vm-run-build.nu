@@ -11,6 +11,8 @@ try {
 
 	run-build-graphene
 	print "Finished build"
+	print "Shutting down VM"
+	sudo shutdown now
 } catch {|e|
 	print -e "vm-run-build.nu failed:"
 	print -e $e.rendered
