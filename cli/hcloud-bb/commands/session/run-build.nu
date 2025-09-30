@@ -10,8 +10,8 @@ export def main [sessionId?: string]: nothing -> string {
 	vm start $sessionId
 	vm sync-scripts $sessionId
 
-	print "Running vm-prepare-build-root.nu script on VM"
-	ssh-into-session-vm --command $"($RUN_NUSHELL_SCRIPT_VM_PATH) vm-prepare-build-root.nu" $sessionId
+	print "Running vm-run-build.nu script on VM"
+	ssh-into-session-vm --command $"($RUN_NUSHELL_SCRIPT_VM_PATH) vm-run-build.nu" $sessionId
 
 	$sessionId
 }

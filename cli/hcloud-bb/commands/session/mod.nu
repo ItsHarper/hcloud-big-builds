@@ -1,6 +1,6 @@
 export module ./create.nu
 export module ./destroy.nu
-export module ./prepare-build-root.nu
+export module ./run-build.nu
 
 export def main []: nothing -> nothing {
 	print "hcloud-bb vm\n"
@@ -11,7 +11,7 @@ export def main []: nothing -> nothing {
 	[
 		"create"
 		"destroy"
-		"prepare-build-root"
+		"run-build"
 	]
 	| each { print $"  hcloud-bb session ($in)"}
 	| ignore
