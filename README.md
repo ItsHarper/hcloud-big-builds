@@ -36,6 +36,7 @@ a great fit.
 
 ## TODO
 
+* Use labels instead of assuming that anything we don't know about can be deleted
 * Track active sessions in Object Storage
 	* For now, delete the whole bucket if no sessions are active
 * Store build artifacts in Object Storage

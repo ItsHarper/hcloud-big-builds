@@ -1,6 +1,7 @@
 # Settings
 export const CONTEXT_NAME = "hcloud-bb"
 export const RESOURCES_NAME_PREFIX = $CONTEXT_NAME
+export const TAG_NAME = $CONTEXT_NAME
 
 export const VM_TYPE = "cpx11"
 # TODO(Harper): Verify that Debian 13 doesn't give us issues
