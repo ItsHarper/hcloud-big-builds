@@ -50,7 +50,15 @@ export def main []: nothing -> record {
 	let ipv4Info = $ipResponse.body.primary_ip
 
 	let session = save-new-session $sessionId $resourcesName $volumeInfo.volume.linux_device $ipv4Info.ip
-	vm start $sessionId
+
+	try {
+		vm start $sessionId
+	} catch {|e|
+		print -e "Failed to start VM (session is still valid):"
+		print -e $e.rendered
+		# Don't throw an error, the session was still created successfully.
+	}
+
 	print $"Created session ($sessionId)"
 
 	$session

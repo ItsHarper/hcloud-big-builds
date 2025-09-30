@@ -25,19 +25,27 @@ export def main [sessionId?: string]: nothing -> string {
 	# the VM, so that it can't get pruned
 	update-session-status $sessionId $SESSION_STATUS_ACTIVE
 
-	if ($sessionVms | length) == 0 {
-		create-vm $session
-	} else {
-		let vm = ($sessionVms | iter only)
-		let status = $vm.status
-		if $status == "off" {
-			print "Starting existing VM"
-			hcloud server poweron $resourcesName
-		} else if $status == "running" {
-			print "VM already started"
+	try {
+		if ($sessionVms | length) == 0 {
+			create-vm $session
 		} else {
-			error make { msg: $"Unrecognized VM status: ($status)" }
+			let vm = ($sessionVms | iter only)
+			let status = $vm.status
+			if $status == "off" {
+				print "Starting existing VM"
+				hcloud server poweron $resourcesName
+			} else if $status == "running" {
+				print "VM already started"
+			} else {
+				error make { msg: $"Unrecognized VM status: ($status)" }
+			}
 		}
+	} catch {|e|
+		print -e "Failed to start VM:"
+		print -e $e.rendered
+
+		update-session-status $sessionId $SESSION_STATUS_READY
+		error make { msg: $"Failed to start VM ($e.msg)" }
 	}
 
 	$sessionId
