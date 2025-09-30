@@ -1,15 +1,11 @@
 use std-rfc/iter
 use ../common/graphene-constants.nu *
 use ($GRAPHENE_COMMON_DIR)/sync-graphene-source.nu
-use ($GRAPHENE_COMMON_DIR)/set-up-vm-for-graphene.nu
 
 export def main []: nothing -> nothing {
 	print ""
 	print "run-build-graphene"
 	print "------------------\n"
-
-	set-up-vm-for-graphene
-
 
 	# Update path according to GrapheneOS build instructions
 	$env.path ++= [
