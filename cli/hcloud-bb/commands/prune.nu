@@ -2,14 +2,14 @@ use ../util/cli-constants.nu *
 use ($CLI_UTIL_DIR)/hcloud-context-management.nu *
 use ($CLI_UTIL_DIR)/hcloud-wrapper.nu *
 use ($CLI_UTIL_DIR)/state.nu *
-use ($CLI_COMMANDS_DIR)/vm
+use ($CLI_COMMANDS_DIR)/list
 
 # TODO(Harper): Check which resources need to be kept
 # TODO(Harper): Prune known_hosts for deleted sessions (do not clear unilaterally)
 export def main []: nothing -> nothing {
 	set-up-hcloud-context
 
-	let vms = vm list
+	let vms = list vms
 	let volumes: table = (
 		hcloud volume list --output json
 		| from json
@@ -28,7 +28,7 @@ export def main []: nothing -> nothing {
 	print "VMs to delete:"
 	print (
 		$vms
-		| vm list make-friendly
+		| list vms make-friendly
 		| table --expand
 	)
 	print "Volumes to delete:"

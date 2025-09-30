@@ -6,7 +6,7 @@ use ($CLI_UTIL_DIR)/hcloud-context-management.nu *
 use ($CLI_UTIL_DIR)/hcloud-wrapper.nu *
 use ($CLI_UTIL_DIR)/ssh.nu *
 use ($CLI_UTIL_DIR)/state.nu *
-use ($CLI_COMMANDS_DIR)/vm/list.nu
+use ($CLI_COMMANDS_DIR)/list
 
 const SCRIPT_DIR = path self .
 
@@ -23,7 +23,7 @@ export def main [sessionId?: string]: oneof<string, nothing> -> string {
 	let resourcesName = $session.resourcesName
 
 	let sessionVms = (
-		list
+		list vms
 		| where name == $resourcesName
 	)
 	if ($sessionVms | length) == 0 {

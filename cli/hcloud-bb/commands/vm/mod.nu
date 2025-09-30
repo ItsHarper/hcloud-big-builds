@@ -1,4 +1,3 @@
-export module ./list.nu
 export module ./shell.nu
 export module ./start.nu
 export module ./sync-scripts.nu
@@ -12,7 +11,6 @@ export def main []: nothing -> nothing {
 
 	print "Subcommands: "
 	[
-		"list"
 		"shell"
 		"start"
 		"sync-scripts"
