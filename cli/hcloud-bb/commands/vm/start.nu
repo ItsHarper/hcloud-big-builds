@@ -52,14 +52,14 @@ export def main [sessionId?: string]: nothing -> string {
 }
 
 def create-vm [session: record]: nothing -> nothing {
-	print "Creating and starting VM"
-
 	let resourcesName = $session.resourcesName
 	let volumeDevPath = $session.volumeDevPath
 	let ipv4Address = $session.ipv4Address
+
+	print "Generating VM configuration"
 	let cloudInitConfig = generate-cloud-init-config $session
 
-	print "Waiting for VM creation to finish"
+	print "Creating and starting VM"
 	let vmInfo = (
 		$cloudInitConfig
 		| to yaml
