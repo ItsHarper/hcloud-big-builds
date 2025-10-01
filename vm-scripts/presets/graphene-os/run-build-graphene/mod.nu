@@ -1,36 +1,26 @@
 use std-rfc/iter
 use ../common/graphene-constants.nu *
 use ($GRAPHENE_COMMON_DIR)/sync-graphene-source.nu
+use ($VM_SCRIPTS_CONSTANTS_PATH) *
+use ($VM_SCRIPTS_UTIL_DIR)/perform-build-step.nu
 
 const RUN_BUILD_SCRIPT_PATH = path self ./run-build.sh
 
 export def main []: nothing -> nothing {
-	print ""
-	print "run-build-graphene"
-	print "------------------\n"
-
-	print "Updating source code"
 	sync-graphene-source
-
-	print "Starting build"
 	build
 }
 
 def build []: nothing -> nothing {
 	$PIXEL_BUILD_TARGETS
 	| each {|pixelCodename|
-		print $"Generating Pixel vendor files for ($pixelCodename)"
-		timeit {
+		perform-build-step "Generate Pixel vendor files for ($pixelCodename)" {
 			adevtool generate-all -d $pixelCodename
 		}
-		| format duration min
-		| print $"($pixelCodename) vendor file generation took ($in)"
 	}
 
 	$BUILD_TARGETS
 	| each {|buildTarget|
-		print $"Building GrapheneOS for ($buildTarget)"
-
 		$env.BUILD_TARGET = $buildTarget
 		$env.BUILD_VARIANT = $BUILD_VARIANT
 		# Update path according to GrapheneOS build instructions for Debian
@@ -40,11 +30,9 @@ def build []: nothing -> nothing {
 				"/usr/local/sbin"
 		]
 
-		timeit {
+		perform-build-step $"Build GrapheneOS for ($buildTarget)" {
 			bash $RUN_BUILD_SCRIPT_PATH
 		}
-		| format duration min
-		| print $"($buildTarget) build took ($in)"
 	}
 	| ignore
 }

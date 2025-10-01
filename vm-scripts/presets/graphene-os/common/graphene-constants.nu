@@ -15,5 +15,6 @@ export const BUILD_TARGETS = [
 # Other
 export const GRAPHENE_COMMON_DIR = path self .
 export const COMMON_CONSTANTS_PATH = path self ../../../../common/common-constants.nu
+export const VM_SCRIPTS_CONSTANTS_PATH = path self ../../../util/vm-constants.nu
 
 use ($COMMON_CONSTANTS_PATH) *

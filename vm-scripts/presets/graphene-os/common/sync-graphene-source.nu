@@ -1,28 +1,34 @@
 use ./graphene-constants.nu *
 use ($COMMON_CONSTANTS_PATH) *
+use ($VM_SCRIPTS_CONSTANTS_PATH) *
+use ($VM_SCRIPTS_UTIL_DIR)/perform-build-step.nu
 
 export def main []: nothing -> nothing {
 	cd $BUILD_ROOT_VM_DIR
 
-	timeit {
-		if $DOWNLOAD_STABLE {
-			print $"Initializing build dir for stable tag ($STABLE_TAG)"
-			repo init -u https://github.com/GrapheneOS/platform_manifest.git -b refs/tags/($STABLE_TAG)
-			mkdir ~/.ssh
-			curl https://grapheneos.org/allowed_signers | save -f ~/.ssh/grapheneos_allowed_signers
-			cd .repo/manifests
-			git config gpg.ssh.allowedSignersFile ~/.ssh/grapheneos_allowed_signers
-			git verify-tag (git describe)
-			cd ../..
-			null
-		} else {
-			print $"Initializing build dir for dev branch ($DEV_BRANCH)"
-			repo init -u https://github.com/GrapheneOS/platform_manifest.git -b $DEV_BRANCH
-			null
+	let stepWithName = if $DOWNLOAD_STABLE {
+		{
+			name: $"Initialize build dir for stable tag ($STABLE_TAG)"
+			step: {
+				repo init -u https://github.com/GrapheneOS/platform_manifest.git -b refs/tags/($STABLE_TAG)
+				mkdir ~/.ssh
+				curl https://grapheneos.org/allowed_signers | save -f ~/.ssh/grapheneos_allowed_signers
+				cd .repo/manifests
+				git config gpg.ssh.allowedSignersFile ~/.ssh/grapheneos_allowed_signers
+				git verify-tag (git describe)
+				null
+			}
+		}
+	} else {
+		{
+			name: $"Initialize build dir for dev branch ($DEV_BRANCH)"
+			step: {
+				repo init -u https://github.com/GrapheneOS/platform_manifest.git -b $DEV_BRANCH
+				null
+			}
 		}
 	}
-	| format duration min
-	| print $"repo initialization took ($in)"
+	perform-build-step $stepWithName.name $stepWithName.step
 
 	let threads: int = (
 		[
@@ -32,13 +38,8 @@ export def main []: nothing -> nothing {
 		| math min
 	)
 
-	print ""
-	print $"Syncing source code with ($threads) threads"
-	print "-------------------"
-	timeit {
-		repo sync -j($threads) --force-sync --verbose out> sync-log.txt
+	perform-build-step $"Syncing source code with ($threads) threads" {
+		repo sync -j($threads) --force-sync --verbose
+		null
 	}
-	| format duration min
-	| print $"repo sync took ($in)"
-	null
 }

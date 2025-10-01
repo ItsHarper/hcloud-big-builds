@@ -1,3 +1,3 @@
 ### GrapheneOS preset `common` folder
 
-Contains code common to the build environment setup script and build script
+Contains code common to `prepare-build-root-graphene` and `run-build-graphene`
