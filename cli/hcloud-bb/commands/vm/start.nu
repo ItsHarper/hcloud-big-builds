@@ -99,23 +99,25 @@ def create-vm [session: record, vmType: string, startingBuild: bool]: nothing ->
 	let resourcesName: string = $session.resourcesName
 	let volumeDevPath: string = $session.volumeDevPath
 	let ipv4Address: string = $session.ipv4Address
+	let vmImage = $VM_IMAGE
 
 	print "Generating VM configuration"
-	let cloudInitConfig = generate-cloud-init-config $session
+	let cloudInitConfig = generate-cloud-init-config $session $vmType $vmImage
 
 	print "Creating and starting VM"
 	let vmInfo = (
 		$cloudInitConfig
 		| to yaml
 		| $"#cloud-config\n\n($in)"
-		| hcloud server create --user-data-from-file - --name $resourcesName --volume $resourcesName --primary-ipv4 $resourcesName --type $vmType --image $VM_IMAGE --datacenter $VM_DATACENTER --quiet --output "json"
+		| hcloud server create --user-data-from-file - --name $resourcesName --volume $resourcesName --primary-ipv4 $resourcesName --type $vmType --image $vmImage --datacenter $VM_DATACENTER --quiet --output "json"
 		| from json
 		| get server
 	)
 }
 
-def generate-cloud-init-config [session: record<volumeDevPath: string>]: nothing -> record {
-	let sshKeys = get-ssh-keys-for-vm-creation $session.id
+def generate-cloud-init-config [session: record<id: string, volumeDevPath: string>, vmType: string, vmImage: string]: nothing -> record {
+	let sessionId = $session.id
+	let sshKeys = get-ssh-keys-for-vm-creation $sessionId
 	{
 		users: [
 			{
@@ -146,6 +148,11 @@ def generate-cloud-init-config [session: record<volumeDevPath: string>]: nothing
 		    ($SSH_KEY_TYPE)_private: $sshKeys.hostPrivateKey,
 		}
 		write_files: [
+			{
+				path: /etc/motd
+				permissions: '0644'
+				content: $"($vmImage) VM \(type ($vmType)\) for ($session.type) session ($sessionId)"
+			},
 			{
 				path: /etc/ssh/sshd_config.d/10-ssh-hardening.conf
 				permissions: '0500'
