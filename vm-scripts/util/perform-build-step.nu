@@ -30,5 +30,5 @@ export def main [stepDesc: string, step: closure]: nothing -> nothing {
 	)
 
 	$"($stepDesc),($duration)\n" | save --append $STEP_DURATIONS_CSV_PATH
-	print $"($stepDesc) took ($duration)"
+	print $"Spent ($duration) on build step: ($stepDesc)"
 }
