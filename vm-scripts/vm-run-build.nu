@@ -22,6 +22,8 @@ try {
 	print -e "vm-run-build.nu failed:"
 	print -e $e.rendered
 	print -e "Shutting down VM in 5 minutes"
-	sudo shutdown +5
+	print -e "Cancel using `atrm <jobNumber>` (the job number will be listed below)"
+	# We're using at instead of the functionality built into shutdown to make sure logins continue to be allowed
+	"sudo shutdown now" | at now + 5 minutes
 	exit 1
 }
