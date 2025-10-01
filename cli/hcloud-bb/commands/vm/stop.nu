@@ -3,14 +3,21 @@ use ($CLI_UTIL_DIR)/state.nu *
 use ($CLI_COMMANDS_DIR)/prune.nu
 use ($CLI_COMMANDS_DIR)/vm/verify-active.nu
 
-export def main [--skip-prune sessionId?: string]: nothing -> nothing {
+export def main [
+	--force
+	--skip-prune sessionId?: string
+]: nothing -> nothing {
 	let session = (get-session $sessionId)
 	let sessionId = $session.id
 	let vmExpectedToBeRunning = ($session.status == $SESSION_STATUS_ACTIVE)
 
 	if $vmExpectedToBeRunning {
-		print "Commanding VM to shut down cleanly"
-		hcloud server shutdown --wait=true --wait-timeout 120s --quiet $session.resourcesName
+		if $force {
+			print $"Skipping clean shutdown"
+		} else {
+			print "Commanding VM to shut down cleanly"
+			hcloud server shutdown --wait=true --wait-timeout 120s --quiet $session.resourcesName
+		}
 	} else {
 		print "The VM should already be stopped"
 	}
