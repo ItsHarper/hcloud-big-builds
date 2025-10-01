@@ -10,7 +10,6 @@ export def main [--full]: nothing -> table {
 		hcloud server list --output json
 		| from json
 		| default []
-		| update created {|vm| $vm.created | into datetime }
 	)
 
 	if $full {
