@@ -1,5 +1,5 @@
-use std-rfc/iter
 use ../../util/cli-constants.nu *
+use ($INTERNAL_COMMAND_PATH)
 use ($CLI_UTIL_DIR)/hcloud-context-management.nu *
 use ($CLI_UTIL_DIR)/hcloud-wrapper.nu *
 
@@ -17,31 +17,6 @@ export def main [--full]: nothing -> table {
 		$fullList
 	} else {
 		$fullList
-		| make-friendly
-	}
-}
-
-def make-friendly []: table -> table {
-	each {|vm|
-		let location: record = $vm.datacenter.location
-		let hourlyPrice = (
-			$vm.server_type.prices
-			| where location == $location.name
-			| iter only
-			| get price_hourly
-			| get gross
-			| into float
-			| $"€($in)"
-		)
-
-		$vm
-		| select name id status server_type volumes created
-		| update server_type {|vm|
-			$vm.server_type
-			| select name cpu_type cores memory
-			| insert "price/hr" $hourlyPrice
-		}
-		| insert location $location.description
-		| move location --before created
+		| each { internal make-friendly vm }
 	}
 }

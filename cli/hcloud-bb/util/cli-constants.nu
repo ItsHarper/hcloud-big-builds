@@ -18,6 +18,7 @@ export const VM_TYPE = "cpx11"
 # Other
 export const CLI_UTIL_DIR = path self .
 export const CLI_COMMANDS_DIR = path self ../commands
+export const INTERNAL_COMMAND_PATH = ($CLI_COMMANDS_DIR)/internal
 export const COMMON_CONSTANTS_PATH = path self ../../../common/common-constants.nu
 export const HCLOUD_CONFIG_FILENAME = "hcloud-cli.toml"
 export const CONFIG_DIR_GITIGNORE_CONTENTS = $"
