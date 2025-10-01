@@ -16,6 +16,7 @@ export def main [sessionId: string, startingBuild: bool]: nothing -> string {
 	let session = get-session $sessionId
 	let sessionId: string = $session.id
 	let resourcesName = $session.resourcesName
+	print "Getting list of existing VMs"
 	let sessionVms = (
 		list vms
 		| where name == $resourcesName
