@@ -31,7 +31,7 @@ def make-friendly []: table -> table {
 			| get price_hourly
 			| get gross
 			| into float
-			| $"$($in)"
+			| $"€($in)"
 		)
 
 		$vm
