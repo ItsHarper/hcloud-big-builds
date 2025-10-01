@@ -138,10 +138,12 @@ def add-session-status-column [sessions: table]: table<name: string> -> table<na
 # * starting (keep volume and VM)
 # * initializingBuildEnvironment (keep volume and VM)
 # * building (keep volume and VM)
+# * shellOpen (keep volume and VM) (needs additional safeguards)
 # * ready (keep volume only)
-# * buildEnvironmentInitializationFailure (keep volume)
-# * investigatingBuildEnvironmentInitializationFailure (keep volume and VM)
 # * destroyed (keep nothing)
+#
+# Rather than having a special state for a build initialization failure,
+# build initialization should be idempotent, even if that means that it nukes and paves the build root.
 #
 # Build errors result in the `ready` status, build environment initialization errors result in the
 # `buildEnvironmentInitializationFailure` status, and all other errors result in the `destroyed` status
