@@ -2,7 +2,7 @@ export def main []: nothing -> nothing {
 	print "Ensuring needed packages are installed"
 	sudo apt-get update
 	# The `repo` package is in the contrib component, which is enabled by default on Hetzner's image
-	sudo apt-get -y install repo yarnpkg zip rsync
+	sudo apt-get -y install e2fsprogs fontconfig repo rsync unzip yarnpkg zip
 
 	print "Configuring git"
 	git config --global user.email "hcloud-bb-builder@example.com"
