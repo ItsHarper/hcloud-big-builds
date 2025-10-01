@@ -19,8 +19,8 @@ export def main [stepDesc: string, externalCommand: string, args: list<string>]:
 	$stepNumber + 1 | save -f $NEXT_STEP_NUMBER_PATH
 
 	let logEntry = $"Performing build step: ($stepDesc)"
-	# Lead with a newline in case the previous output didn't end with a newline
-	print $"\n($logEntry)"
+	# The previous output may not have ended with a newline, so we need to start by printing two to guarantee separation
+	print $"\n\n($logEntry)"
 	$"($logEntry)\n\n" | save $stepLogPath
 
 	let duration: string = (
@@ -32,5 +32,5 @@ export def main [stepDesc: string, externalCommand: string, args: list<string>]:
 	)
 
 	$"($stepDesc),($duration)\n" | save --append $STEP_DURATIONS_CSV_PATH
-	print $"Spent ($duration) on build step: ($stepDesc)"
+	print $"Spent ($duration) on build step: ($stepDesc)\n"
 }
