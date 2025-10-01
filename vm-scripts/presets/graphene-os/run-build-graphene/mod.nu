@@ -1,4 +1,3 @@
-use std-rfc/iter
 use ../common/graphene-constants.nu *
 use ($GRAPHENE_COMMON_DIR)/sync-graphene-source.nu
 use ($VM_SCRIPTS_CONSTANTS_PATH) *

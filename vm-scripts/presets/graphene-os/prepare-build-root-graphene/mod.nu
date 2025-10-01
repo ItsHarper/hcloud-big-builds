@@ -1,4 +1,3 @@
-use std-rfc/iter
 use ../common/graphene-constants.nu *
 use ($COMMON_CONSTANTS_PATH) *
 use ($VM_SCRIPTS_CONSTANTS_PATH) *

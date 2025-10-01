@@ -1,4 +1,3 @@
-use std/assert
 use std-rfc/iter
 use ../../util/cli-constants.nu *
 use ($COMMON_CONSTANTS_PATH) *

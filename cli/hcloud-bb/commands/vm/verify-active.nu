@@ -1,3 +1,4 @@
+use std-rfc/iter
 use ../../util/cli-constants.nu *
 use ($CLI_UTIL_DIR)/state.nu *
 use ($CLI_COMMANDS_DIR)/list
