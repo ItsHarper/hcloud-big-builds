@@ -1,4 +1,3 @@
-use std-rfc/iter
 use ../../util/cli-constants.nu *
 use $COMMON_CONSTANTS_PATH *
 use $INTERNAL_COMMAND_PATH
@@ -39,33 +38,54 @@ def get-needed-action [$sessionId: string, startingBuild: bool]: nothing -> clos
 	let session = get-session $sessionId
 	let sessionId: string = $session.id
 	let resourcesName = $session.resourcesName
+	let desiredVmType: string = get-desired-vm-type $session.type $startingBuild
+
 	print "Getting list of existing VMs"
-	let sessionVms = (
+	let existingVm: oneof<record, nothing> = (
 		list vms
 		| where name == $resourcesName
+		| get --optional 0
 	)
 
-	if ($sessionVms | length) > 0 {
-		{ reuse-existing-vm ($sessionVms | iter only) }
-	} else {
-		let vmType: string = get-desired-vm-type $session.type $startingBuild
+	if $existingVm != null {
+		# We can only reuse existing VMs if they match our
+		# desired type or we are NOT about to start a build
+		if $existingVm.server_type.name == $desiredVmType or not $startingBuild {
+			return { reuse-existing-vm $existingVm }
+		}
+	}
 
-		print "Fetching VM type details"
-		let vmTypeDetails = (
-			hcloud server-type describe --output json $vmType
-			| from json
-			| internal make-friendly vm-type $VM_LOCATION
-		)
+	print "Fetching VM type details"
+	let vmTypeDetails = (
+		hcloud server-type describe --output json $desiredVmType
+		| from json
+		| internal make-friendly vm-type $VM_LOCATION
+	)
 
+	if $existingVm == null {
 		print "Are you sure you would like to create a VM of this type?"
-		print ($vmTypeDetails | table --expand)
-		let confirmed = [[text result]; [Yes true] [No false]] | input list -d text | get result
+	} else {
+		print "Are you sure you would like to replace the existing VM with one of this type?"
+	}
+	print ($vmTypeDetails | table --expand)
+	let confirmed = [[text result]; [Yes true] [No false]] | input list -d text | get result
 
-		if not $confirmed {
-			error make { msg: "User did not confirm VM creation" }
+	if not $confirmed {
+		error make { msg: "User did not confirm VM creation" }
+	}
+
+	{ # Return closure
+		if $existingVm != null {
+			# It's critical that we do NOT change the session's status, so we must use `hcloud` directly
+
+			print "Shutting down existing VM"
+			hcloud server shutdown --wait=true --wait-timeout 120s --quiet $existingVm.id
+
+			print "Deleting existing VM"
+			hcloud server delete $existingVm.id
 		}
 
-		{ create-vm $session $vmType $startingBuild }
+		create-vm $session $desiredVmType $startingBuild
 	}
 }
 
