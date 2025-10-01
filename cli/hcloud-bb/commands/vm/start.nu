@@ -18,6 +18,7 @@ export def main [sessionId: string, startingBuild: bool]: nothing -> string {
 
 		# Make sure the status is set to ACTIVE before we actually change
 		# the state of a, so that it can't get pruned
+		print $"Marking session as ($SESSION_STATUS_ACTIVE)"
 		update-session-status $sessionId $SESSION_STATUS_ACTIVE
 
 		do $action
@@ -47,7 +48,7 @@ def get-needed-action [$sessionId: string, startingBuild: bool]: nothing -> clos
 	if ($sessionVms | length) > 0 {
 		{ reuse-existing-vm ($sessionVms | iter only) }
 	} else {
-		let vmType: string = get-desired-vm-type $session.type
+		let vmType: string = get-desired-vm-type $session.type $startingBuild
 
 		print "Fetching VM type details"
 		let vmTypeDetails = (
@@ -68,7 +69,7 @@ def get-needed-action [$sessionId: string, startingBuild: bool]: nothing -> clos
 	}
 }
 
-def get-desired-vm-type [sessionType: string]: nothing -> string {
+def get-desired-vm-type [sessionType: string, startingBuild: bool]: nothing -> string {
 	if $sessionType == $SESSION_TYPE_TEST_ONLY {
 		$VM_TYPE_TEST_INVESTIGATE
 	} else if $sessionType == $SESSION_TYPE_GRAPHENE {
@@ -84,7 +85,7 @@ def get-desired-vm-type [sessionType: string]: nothing -> string {
 
 def reuse-existing-vm [vm: record]: nothing -> nothing {
 	print "Reusing existing VM:"
-	print ($vm | table --expand)
+	print ($vm | reject id volumes | table --expand)
 	let status = $vm.status
 	if $status == "off" {
 		print "Starting VM"
