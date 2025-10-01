@@ -25,7 +25,10 @@ export def main [stepDesc: string, externalCommand: string, args: list<string>]:
 
 	let duration: string = (
 		timeit {
-			run-external $externalCommand ...$args err+out>| save --append $stepLogPath
+			# TODO(Harper): Why are non-zero exit codes getting swallowed when we capture the output?
+			#               Fixing this properly may require experimental pipefail feature in nushell 0.108.0
+			# run-external $externalCommand ...$args err+out>| save --append $stepLogPath
+			run-external $externalCommand ...$args
 			null
 		}
 		| format duration min
