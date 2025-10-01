@@ -7,7 +7,7 @@ use ($CLI_COMMANDS_DIR)/vm
 export def main [sessionId?: string]: nothing -> string {
 	let sessionId: string = (get-session $sessionId).id
 
-	vm start $sessionId
+	vm start $sessionId true
 	vm sync-scripts $sessionId
 
 	print "Running vm-run-build.nu script on VM"

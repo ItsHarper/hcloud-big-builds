@@ -10,13 +10,25 @@ const SCRIPT_DIR = path self .
 export def main []: nothing -> record {
 	set-up-hcloud-context
 
+	let sessionTypeInfo: record = (
+		[
+			[description sessionTypeInfo];
+			["GrapheneOS" { type: $SESSION_TYPE_GRAPHENE, volumeSizeGiB: $VOLUME_SIZE_GRAPHENE_SESSION_GiB }]
+			["Testing only" { type: $SESSION_TYPE_TEST_ONLY, volumeSizeGiB: $VOLUME_SIZE_TEST_ONLY_SESSION_GiB }]
+		]
+		| input list -d description "Select session type"
+		| get sessionTypeInfo
+	)
+	let sessionType: string = $sessionTypeInfo.type
+	let volumeSizeGiB: int = $sessionTypeInfo.volumeSizeGiB
+
 	let sessionId = random chars --length 7
 	let resourcesName = ($RESOURCES_NAME_PREFIX)-($sessionId)
 
 	# TODO(Harper): Determine whether the hcloud docs actually mean "GB" or if they really mean "GiB"
 	print "Creating volume"
 	let volumeInfo: record = (
-		hcloud volume create --name $resourcesName --size $VOLUME_SIZE_GiB --format $VOLUME_FS --location $VM_LOCATION --quiet --output "json"
+		hcloud volume create --name $resourcesName --size $volumeSizeGiB --format $VOLUME_FS --location $VM_LOCATION --quiet --output "json"
 		| from json
 	)
 
@@ -50,10 +62,11 @@ export def main []: nothing -> record {
 	}
 	let ipv4Info = $ipResponse.body.primary_ip
 
-	save-new-session $sessionId $resourcesName $volumeInfo.volume.linux_device $ipv4Info.ip
+	save-new-session $sessionId $sessionType $resourcesName $volumeInfo.volume.linux_device $ipv4Info.ip
 
 	try {
-		vm start $sessionId
+		let buildSession = $sessionType != $SESSION_TYPE_TEST_ONLY
+		vm start $sessionId $buildSession
 	} catch {|e|
 		print -e "Failed to start VM (session is still valid):"
 		print -e $e.rendered

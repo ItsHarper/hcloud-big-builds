@@ -2,11 +2,14 @@ use std-rfc/iter
 use ./cli-constants.nu *
 use ./hcloud-wrapper.nu *
 
+export const SESSION_TYPE_TEST_ONLY = "test-only"
+export const SESSION_TYPE_GRAPHENE = "GrapheneOS"
 export const SESSION_STATUS_READY = "READY" # Has no VM
 export const SESSION_STATUS_ACTIVE = "ACTIVE" # Has VM
 
 export def save-new-session [
 	id: string
+	type: string
 	resourcesName: string
 	volumeDevPath: string
 	ipv4Address: string
@@ -15,6 +18,7 @@ export def save-new-session [
 	let sshKeysDir = (get-ssh-keys-root-dir)/($id)
 	let session = {
 		id: $id
+		type: $type
 		status: $SESSION_STATUS_READY
 		ipv4Address: $ipv4Address
 		resourcesName: $resourcesName

@@ -9,11 +9,10 @@ export const VM_LOCATION = "nbg1" # Nuremburg, Germany
 export const VM_DATACENTER = $"($VM_LOCATION)-dc3" # Use `hcloud datacenter list`
 export const VOLUME_FS = "ext4"
 
-# TODO(Harper): Default to low-power VM, require flag for high-power VM, verify already-started VM is expected type
-export const VOLUME_SIZE_GiB = 10
-export const VM_TYPE = "cpx11"
-# export const VOLUME_SIZE_GiB = 400
-# export const VM_TYPE = "ccx63" # TODO(Harper): Compare costs for different tiers
+export const VOLUME_SIZE_TEST_ONLY_SESSION_GiB = 10
+export const VOLUME_SIZE_GRAPHENE_SESSION_GiB = 400
+export const VM_TYPE_TEST_INVESTIGATE = "cpx11"
+export const VM_TYPE_BUILD_GRAPHENE = "ccx63" # TODO(Harper): Compare costs for different tiers
 
 # Other
 export const CLI_UTIL_DIR = path self .

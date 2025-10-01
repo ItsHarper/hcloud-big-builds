@@ -1,6 +1,7 @@
 use std-rfc/iter
 use ../../util/cli-constants.nu *
-use ($COMMON_CONSTANTS_PATH) *
+use $COMMON_CONSTANTS_PATH *
+use $INTERNAL_COMMAND_PATH
 use ($CLI_UTIL_DIR)/hcloud-context-management.nu *
 use ($CLI_UTIL_DIR)/hcloud-wrapper.nu *
 use ($CLI_UTIL_DIR)/ssh.nu *
@@ -9,7 +10,7 @@ use ($CLI_COMMANDS_DIR)/list
 
 const SCRIPT_DIR = path self .
 
-export def main [sessionId?: string]: nothing -> string {
+export def main [sessionId: string, startingBuild: bool]: nothing -> string {
 	set-up-hcloud-context
 
 	let session = get-session $sessionId
@@ -26,16 +27,16 @@ export def main [sessionId?: string]: nothing -> string {
 
 	try {
 		if ($sessionVms | length) == 0 {
-			create-vm $session
+			create-vm $session $startingBuild
 		} else {
+			print "Reusing existing VM:"
 			let vm = ($sessionVms | iter only)
+			print ($vm | table --expand)
 			let status = $vm.status
 			if $status == "off" {
-				print "Starting existing VM"
+				print "Starting VM"
 				hcloud server poweron $resourcesName
-			} else if $status == "running" {
-				print "VM already started"
-			} else {
+			} else if $status != "running" {
 				error make { msg: $"Unrecognized VM status: ($status)" }
 			}
 		}
@@ -50,10 +51,37 @@ export def main [sessionId?: string]: nothing -> string {
 	$sessionId
 }
 
-def create-vm [session: record]: nothing -> nothing {
-	let resourcesName = $session.resourcesName
-	let volumeDevPath = $session.volumeDevPath
-	let ipv4Address = $session.ipv4Address
+def create-vm [session: record, startingBuild: bool]: nothing -> nothing {
+	let sessionType: string = $session.type
+	let resourcesName: string = $session.resourcesName
+	let volumeDevPath: string = $session.volumeDevPath
+	let ipv4Address: string = $session.ipv4Address
+	let vmType: string = (
+		if $sessionType == $SESSION_TYPE_TEST_ONLY {
+			$VM_TYPE_TEST_INVESTIGATE
+		} else if $sessionType == $SESSION_TYPE_GRAPHENE {
+			if $startingBuild {
+				$VM_TYPE_BUILD_GRAPHENE
+			} else {
+				$VM_TYPE_TEST_INVESTIGATE
+			}
+		} else {
+			error make { msg: $"Unrecognized session type: ($sessionType)" }
+		}
+	)
+
+	print $"Are you sure you would like to create a VM of this type?"
+	print (
+		hcloud server-type describe --output json $vmType
+		| from json
+		| internal make-friendly vm-type $VM_LOCATION
+		| table --expand
+	)
+	let confirmed = [[text result]; [Yes true] [No false]] | input list -d text | get result
+
+	if not $confirmed {
+		error make { msg: "User did not confirm VM creation" }
+	}
 
 	print "Generating VM configuration"
 	let cloudInitConfig = generate-cloud-init-config $session
@@ -63,7 +91,7 @@ def create-vm [session: record]: nothing -> nothing {
 		$cloudInitConfig
 		| to yaml
 		| $"#cloud-config\n\n($in)"
-		| hcloud server create --user-data-from-file - --name $resourcesName --volume $resourcesName --primary-ipv4 $resourcesName --type $VM_TYPE --image $VM_IMAGE --datacenter $VM_DATACENTER --quiet --output "json"
+		| hcloud server create --user-data-from-file - --name $resourcesName --volume $resourcesName --primary-ipv4 $resourcesName --type $vmType --image $VM_IMAGE --datacenter $VM_DATACENTER --quiet --output "json"
 		| from json
 		| get server
 	)
