@@ -14,7 +14,7 @@ export def prepare-build-logs-dir []: nothing -> nothing {
 
 export def main [stepDesc: string, step: closure]: nothing -> nothing {
 	let stepNumber = open $NEXT_STEP_NUMBER_PATH | into int
-	let stepLogPath = $"($BUILD_LOGS_DIR)/($stepNumber |  fill --width 4 --character 0 --alignment right) - ($stepDesc)"
+	let stepLogPath = $"($BUILD_LOGS_DIR)/($stepNumber |  fill --width 4 --character 0 --alignment right) - ($stepDesc).txt"
 	$stepNumber + 1 | save -f $NEXT_STEP_NUMBER_PATH
 
 	let header = $"Beginning build step: ($stepDesc)"
