@@ -19,7 +19,8 @@ export def main [stepDesc: string, externalCommand: string, args: list<string>]:
 	$stepNumber + 1 | save -f $NEXT_STEP_NUMBER_PATH
 
 	let logEntry = $"Performing build step: ($stepDesc)"
-	print $logEntry
+	# Lead with a newline in case the previous output didn't end with a newline
+	print $"\n($logEntry)"
 	$"($logEntry)\n\n" | save $stepLogPath
 
 	let duration: string = (
