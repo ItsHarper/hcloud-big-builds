@@ -20,6 +20,10 @@ export def main [--full]: nothing -> table {
 	}
 }
 
-export def make-friendly []: table -> table {
-	select name id status volumes created
+def make-friendly []: table -> table {
+	select name id status server_type volumes created
+	| update server_type {|vm|
+		$vm.server_type
+		| select name cpu_type cores memory
+	}
 }
