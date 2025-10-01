@@ -12,18 +12,19 @@ export def prepare-build-logs-dir []: nothing -> nothing {
 	1 | save $NEXT_STEP_NUMBER_PATH
 }
 
-export def main [stepDesc: string, step: closure]: nothing -> nothing {
+# Only use this for build steps that are time-consuming or print a lot of output
+export def main [stepDesc: string, externalCommand: string, args: list<string>]: nothing -> nothing {
 	let stepNumber = open $NEXT_STEP_NUMBER_PATH | into int
 	let stepLogPath = $"($BUILD_LOGS_DIR)/($stepNumber |  fill --width 4 --character 0 --alignment right) - ($stepDesc).txt"
 	$stepNumber + 1 | save -f $NEXT_STEP_NUMBER_PATH
 
-	let header = $"Beginning build step: ($stepDesc)"
-	print $"\n\n($header)\n\n"
-	$"($header)\n\n" | save $stepLogPath
+	let logEntry = $"Performing build step: ($stepDesc)"
+	print $logEntry
+	$"($logEntry)\n\n" | save $stepLogPath
 
 	let duration: string = (
 		timeit {
-			do $step err+out>| tee { save --append $stepLogPath }
+			run-external $externalCommand ...$args err+out>| save --append $stepLogPath
 			null
 		}
 		| format duration min

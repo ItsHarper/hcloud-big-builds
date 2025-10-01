@@ -14,9 +14,11 @@ export def main []: nothing -> nothing {
 def build []: nothing -> nothing {
 	$PIXEL_BUILD_TARGETS
 	| each {|pixelCodename|
-		perform-build-step "Generate Pixel vendor files for ($pixelCodename)" {
-			adevtool generate-all -d $pixelCodename
-		}
+		perform-build-step $"Generate Pixel vendor files for ($pixelCodename)" adevtool [
+			"generate-all"
+			"-d"
+			$pixelCodename
+		]
 	}
 
 	$BUILD_TARGETS
@@ -30,9 +32,9 @@ def build []: nothing -> nothing {
 				"/usr/local/sbin"
 		]
 
-		perform-build-step $"Build GrapheneOS for ($buildTarget)" {
-			bash $RUN_BUILD_SCRIPT_PATH
-		}
+		perform-build-step $"Build GrapheneOS for ($buildTarget)" bash [
+			$RUN_BUILD_SCRIPT_PATH
+		]
 	}
 	| ignore
 }

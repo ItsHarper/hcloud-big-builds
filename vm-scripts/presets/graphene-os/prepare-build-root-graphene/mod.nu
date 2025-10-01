@@ -13,8 +13,7 @@ export def main []: nothing -> nothing {
 }
 
 def prepare-for-pixel-vendor-files-generation []: nothing -> nothing {
-	perform-build-step "Prepare for generation of pixel vendor files" {
-		bash $PREPARE_PIXEL_FILES_SCRIPT_PATH
-		null
-	}
+	perform-build-step "Prepare for generation of pixel vendor files" bash [
+		$PREPARE_PIXEL_FILES_SCRIPT_PATH
+	]
 }
