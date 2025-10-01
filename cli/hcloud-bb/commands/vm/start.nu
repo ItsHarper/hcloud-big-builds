@@ -13,34 +13,14 @@ const SCRIPT_DIR = path self .
 export def main [sessionId: string, startingBuild: bool]: nothing -> string {
 	set-up-hcloud-context
 
-	let session = get-session $sessionId
-	let sessionId: string = $session.id
-	let resourcesName = $session.resourcesName
-	print "Getting list of existing VMs"
-	let sessionVms = (
-		list vms
-		| where name == $resourcesName
-	)
-
-	# Make sure the status is set to ACTIVE before we actually start
-	# the VM, so that it can't get pruned
-	update-session-status $sessionId $SESSION_STATUS_ACTIVE
-
 	try {
-		if ($sessionVms | length) == 0 {
-			create-vm $session $startingBuild
-		} else {
-			print "Reusing existing VM:"
-			let vm = ($sessionVms | iter only)
-			print ($vm | table --expand)
-			let status = $vm.status
-			if $status == "off" {
-				print "Starting VM"
-				hcloud server poweron $resourcesName
-			} else if $status != "running" {
-				error make { msg: $"Unrecognized VM status: ($status)" }
-			}
-		}
+		let action = get-needed-action $sessionId $startingBuild
+
+		# Make sure the status is set to ACTIVE before we actually change
+		# the state of a, so that it can't get pruned
+		update-session-status $sessionId $SESSION_STATUS_ACTIVE
+
+		do $action
 	} catch {|e|
 		print -e "Failed to start VM:"
 		print -e $e.rendered
@@ -52,37 +32,72 @@ export def main [sessionId: string, startingBuild: bool]: nothing -> string {
 	$sessionId
 }
 
-def create-vm [session: record, startingBuild: bool]: nothing -> nothing {
-	let sessionType: string = $session.type
+# Does all the needed prep work to figure out what needs to happen, without actually
+# updating the state of the VM (that's the responsibility of the returned closure).
+def get-needed-action [$sessionId: string, startingBuild: bool]: nothing -> closure {
+	let session = get-session $sessionId
+	let sessionId: string = $session.id
+	let resourcesName = $session.resourcesName
+	print "Getting list of existing VMs"
+	let sessionVms = (
+		list vms
+		| where name == $resourcesName
+	)
+
+	if ($sessionVms | length) > 0 {
+		{ reuse-existing-vm ($sessionVms | iter only) }
+	} else {
+		let vmType: string = get-desired-vm-type $session.type
+
+		print "Fetching VM type details"
+		let vmTypeDetails = (
+			hcloud server-type describe --output json $vmType
+			| from json
+			| internal make-friendly vm-type $VM_LOCATION
+		)
+
+		print "Are you sure you would like to create a VM of this type?"
+		print ($vmTypeDetails | table --expand)
+		let confirmed = [[text result]; [Yes true] [No false]] | input list -d text | get result
+
+		if not $confirmed {
+			error make { msg: "User did not confirm VM creation" }
+		}
+
+		{ create-vm $session $vmType $startingBuild }
+	}
+}
+
+def get-desired-vm-type [sessionType: string]: nothing -> string {
+	if $sessionType == $SESSION_TYPE_TEST_ONLY {
+		$VM_TYPE_TEST_INVESTIGATE
+	} else if $sessionType == $SESSION_TYPE_GRAPHENE {
+		if $startingBuild {
+			$VM_TYPE_BUILD_GRAPHENE
+		} else {
+			$VM_TYPE_TEST_INVESTIGATE
+		}
+	} else {
+		error make { msg: $"Unrecognized session type: ($sessionType)" }
+	}
+}
+
+def reuse-existing-vm [vm: record]: nothing -> nothing {
+	print "Reusing existing VM:"
+	print ($vm | table --expand)
+	let status = $vm.status
+	if $status == "off" {
+		print "Starting VM"
+		hcloud server poweron $vm.name
+	} else if $status != "running" {
+		error make { msg: $"Unrecognized VM status: ($status)" }
+	}
+}
+
+def create-vm [session: record, vmType: string, startingBuild: bool]: nothing -> nothing {
 	let resourcesName: string = $session.resourcesName
 	let volumeDevPath: string = $session.volumeDevPath
 	let ipv4Address: string = $session.ipv4Address
-	let vmType: string = (
-		if $sessionType == $SESSION_TYPE_TEST_ONLY {
-			$VM_TYPE_TEST_INVESTIGATE
-		} else if $sessionType == $SESSION_TYPE_GRAPHENE {
-			if $startingBuild {
-				$VM_TYPE_BUILD_GRAPHENE
-			} else {
-				$VM_TYPE_TEST_INVESTIGATE
-			}
-		} else {
-			error make { msg: $"Unrecognized session type: ($sessionType)" }
-		}
-	)
-
-	print $"Are you sure you would like to create a VM of this type?"
-	print (
-		hcloud server-type describe --output json $vmType
-		| from json
-		| internal make-friendly vm-type $VM_LOCATION
-		| table --expand
-	)
-	let confirmed = [[text result]; [Yes true] [No false]] | input list -d text | get result
-
-	if not $confirmed {
-		error make { msg: "User did not confirm VM creation" }
-	}
 
 	print "Generating VM configuration"
 	let cloudInitConfig = generate-cloud-init-config $session
