@@ -29,9 +29,8 @@ def make-friendly []: table -> table {
 			| where location == $location.name
 			| iter only
 			| get price_hourly
-			| get net
+			| get gross
 			| into float
-			# | $"$($in) / hr"
 			| $"$($in)"
 		)
 
