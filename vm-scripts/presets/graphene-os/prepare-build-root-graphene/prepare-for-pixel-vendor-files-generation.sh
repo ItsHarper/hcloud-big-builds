@@ -4,7 +4,7 @@ set -eo pipefail
 cd /mnt/build-root
 
 # yarnpkg is the name of the Debian package for yarn
-yarnpkg --cwd install vendor/adevtool/
+yarnpkg --cwd vendor/adevtool/ install
 source build/envsetup.sh
 lunch sdk_phone64_x86_64-cur-user
 m arsclib
