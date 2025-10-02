@@ -195,25 +195,3 @@ AllowAgentForwarding no
 		]
 	}
 }
-
-# # For build commands:
-# try {
-# 	print "Initializing build environment"
-
-# 	# TODO(Harper): Run build environment initialization without capturing output
-# } catch {|e|
-# 	print -e "Failed to initialize build environment:"
-# 	print -e $e.rendered
-# 	error make { msg: "Session was not started (build setup step failed). Make sure to destroy the volume after investigating." }
-# }
-
-# try {
-# 	print $"Successfully started session ($sessionId)"
-# 	print "Running first build"
-# 	# TODO(Harper): Run build without capturing output
-# 	print "First build succeeded"
-# } catch {|e|
-# 	print -e "First build failed:"
-# 	print -e $e.rendered
-# 	print  "\nSession was successfully created and is valid despite build failure"
-# }
