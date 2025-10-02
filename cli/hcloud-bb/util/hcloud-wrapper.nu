@@ -1,6 +1,6 @@
 use ./cli-constants.nu *
 
-const HCLOUD_VERSION = "1.52.0"
+const HCLOUD_VERSION = "1.53.0"
 
 # Run pinned version of hcloud
 export def --wrapped hcloud [...rest]: oneof<nothing, string> -> string {
@@ -8,6 +8,7 @@ export def --wrapped hcloud [...rest]: oneof<nothing, string> -> string {
 	let hcloudPath = get-hcloud-path
 
 	if not ($hcloudPath | path exists) or (run-external $hcloudPath "version") != $"hcloud ($HCLOUD_VERSION)" {
+		print $"Need to replace (run-external $hcloudPath "version") with hcloud ($HCLOUD_VERSION)"
 		# TODO(Harper): Package nu_plugin_compress for Chimera Linux
 		error make { msg: "`hcloud` download code is currently disabled" }
 		# plugin use compress
