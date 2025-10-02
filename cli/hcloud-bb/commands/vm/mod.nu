@@ -4,6 +4,7 @@ export module ./stop.nu
 export module ./sync-scripts.nu
 export module ./verify-active.nu
 
+# TODO(Harper): Move to `commands/internal`
 export def main []: nothing -> nothing {
 	print "hcloud-bb vm\n"
 

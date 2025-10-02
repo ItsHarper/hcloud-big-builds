@@ -1,5 +1,6 @@
 export module ./make-friendly/
 
+# TODO(Harper): Expose this on the main CLI
 export def main []: nothing -> nothing {
 	print "internal\n"
 

@@ -7,7 +7,7 @@ const GENERATE_PIXEL_VENDOR_FILES_SCRIPT_PATH = path self ./generate-pixel-vendo
 const RUN_BUILD_SCRIPT_PATH = path self ./run-build.sh
 
 export def main []: nothing -> nothing {
-	sync-graphene-source
+	sync-graphene-source # TODO(Harper): Skip if we just did this
 	build
 }
 

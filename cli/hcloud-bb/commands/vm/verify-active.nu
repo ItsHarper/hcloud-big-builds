@@ -3,6 +3,7 @@ use ../../util/cli-constants.nu *
 use ($CLI_UTIL_DIR)/state.nu *
 use ($CLI_COMMANDS_DIR)/list
 
+# TODO(Harper): Get rid of this command (we should be calling vm start instead)
 export def main [sessionId: string]: nothing -> nothing {
 	let session = (get-session $sessionId)
 
@@ -18,6 +19,7 @@ export def main [sessionId: string]: nothing -> nothing {
 	| if $in != running { error make { msg: "VM is not actually running" } }
 
 	wait-for-vm-ping $session.ipv4Address
+	# TODO(Harper): If the ping took longer than a second, try making a no-op SSH connection a few times
 }
 
 def wait-for-vm-ping [ipAddress: string]: nothing -> nothing {

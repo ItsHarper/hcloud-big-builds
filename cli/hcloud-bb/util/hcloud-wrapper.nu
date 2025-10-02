@@ -2,6 +2,7 @@ use ./cli-constants.nu *
 
 const HCLOUD_VERSION = "1.53.0"
 
+# TODO(Harper): Export this from the main CLI
 # Run pinned version of hcloud
 export def --wrapped hcloud [...rest]: oneof<nothing, string> -> string {
 	let input = $in
