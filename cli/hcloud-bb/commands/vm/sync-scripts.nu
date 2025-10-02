@@ -9,6 +9,7 @@ export def main [sessionId: string]: nothing -> string {
 	print "Syncing scripts to VM"
 	rsync-to-session-vm $TOP_LEVEL_COMMON_DIR $HCLOUD_BB_VM_DIR $sessionId
 	rsync-to-session-vm $VM_SCRIPTS_DIR $HCLOUD_BB_VM_DIR $sessionId
+	rsync-to-session-vm ($VM_CONFIG_DIR)/ /home/($VM_USERNAME)/.config $sessionId
 
 	$sessionId
 }
