@@ -5,8 +5,10 @@ use ($VM_SCRIPTS_UTIL_DIR)/perform-build-step.nu
 
 const RUN_BUILD_SCRIPT_PATH = path self ./run-build.sh
 
-export def main []: nothing -> nothing {
-	sync-graphene-source # TODO(Harper): Skip if we just did this
+export def main [preparationJustRan: bool]: nothing -> nothing {
+	if not $preparationJustRan {
+		sync-graphene-source
+	}
 	build
 }
 

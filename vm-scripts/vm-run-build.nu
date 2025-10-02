@@ -7,14 +7,16 @@ try {
 	set-up-vm-for-graphene
 	prepare-build-logs-dir
 
-	if not ($BUILD_ROOT_PREPARED_PATH | path exists) {
+	let runPreparation = not ($BUILD_ROOT_PREPARED_PATH | path exists)
+
+	if $runPreparation {
 		use ./presets/graphene-os/prepare-build-root-graphene
 		prepare-build-root-graphene
 		touch $BUILD_ROOT_PREPARED_PATH
 		print "Finished preparing build root"
 	}
 
-	run-build-graphene
+	run-build-graphene $runPreparation
 	print "Finished build"
 	schedule-shutdown
 } catch {|e|
