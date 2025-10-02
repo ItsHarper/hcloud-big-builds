@@ -25,7 +25,7 @@ export def main [
 			| where $include_non_x86 or $it.architecture == "x86"
 			# | sort-by cpu_type
 			| each { internal make-friendly vm-type $VM_LOCATION $additionalFields }
-			| sort-by --reverse €/hr
+			| sort-by --reverse ([$CURRENCY_PER_HOUR] | into cell-path)
 			| sort-by --reverse memory
 			| sort-by --reverse cpu_type
 		)

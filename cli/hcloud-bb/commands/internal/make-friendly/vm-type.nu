@@ -17,5 +17,5 @@ export def main [
 
 	$vmType
 	| select name architecture memory cpu_type cores ...$additionalFields
-	| insert "€/hr" $hourlyPrice
+	| insert $CURRENCY_PER_HOUR $hourlyPrice
 }
