@@ -8,7 +8,7 @@ export def prepare-build-logs-dir []: nothing -> nothing {
 		rm -r $BUILD_LOGS_DIR
 	}
 	mkdir $BUILD_LOGS_DIR
-	"Step discription,duration\n" | save $STEP_DURATIONS_CSV_PATH
+	"Step,duration\n" | save $STEP_DURATIONS_CSV_PATH
 	1 | save $NEXT_STEP_NUMBER_PATH
 }
 
