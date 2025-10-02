@@ -3,7 +3,6 @@ use ($GRAPHENE_COMMON_DIR)/sync-graphene-source.nu
 use ($VM_SCRIPTS_CONSTANTS_PATH) *
 use ($VM_SCRIPTS_UTIL_DIR)/perform-build-step.nu
 
-const GENERATE_PIXEL_VENDOR_FILES_SCRIPT_PATH = path self ./generate-pixel-vendor-files.sh
 const RUN_BUILD_SCRIPT_PATH = path self ./run-build.sh
 
 export def main []: nothing -> nothing {
@@ -12,14 +11,6 @@ export def main []: nothing -> nothing {
 }
 
 def build []: nothing -> nothing {
-	$PIXEL_BUILD_TARGETS
-	| each {|pixelCodename|
-		$env.PIXEL_CODENAME = $pixelCodename
-		perform-build-step $"Generate Pixel vendor files for ($pixelCodename)" bash [
-			$GENERATE_PIXEL_VENDOR_FILES_SCRIPT_PATH
-		]
-	}
-
 	$BUILD_TARGETS
 	| each {|buildTarget|
 		$env.BUILD_TARGET = $buildTarget
