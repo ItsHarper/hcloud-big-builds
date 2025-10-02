@@ -14,8 +14,7 @@ export def main []: nothing -> nothing {
 def build []: nothing -> nothing {
 	$PIXEL_BUILD_TARGETS
 	| each {|pixelCodename|
-		$env.BUILD_TARGET = $pixelCodename
-		$env.BUILD_VARIANT = $BUILD_VARIANT
+		$env.PIXEL_CODENAME = $pixelCodename
 		perform-build-step $"Generate Pixel vendor files for ($pixelCodename)" bash [
 			$GENERATE_PIXEL_VENDOR_FILES_SCRIPT_PATH
 		]
