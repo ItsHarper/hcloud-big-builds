@@ -65,8 +65,12 @@ export def main []: nothing -> record {
 	save-new-session $sessionId $sessionType $resourcesName $volumeInfo.volume.linux_device $ipv4Info.ip
 
 	try {
-		let buildSession = $sessionType != $SESSION_TYPE_TEST_ONLY
-		vm start $sessionId $buildSession
+		let mandatoryVmType = if $sessionType == $SESSION_TYPE_TEST_ONLY {
+			null
+		} else {
+			$VM_TYPE_BUILD_GRAPHENE
+		}
+		vm start $sessionId $mandatoryVmType
 	} catch {|e|
 		print -e "Failed to start VM (session is still valid):"
 		print -e $e.rendered

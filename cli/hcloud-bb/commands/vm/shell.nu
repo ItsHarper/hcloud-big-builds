@@ -6,7 +6,7 @@ use ($CLI_COMMANDS_DIR)/vm/verify-active.nu
 export def main [sessionId?: string]: nothing -> nothing {
 	let sessionId: string = (get-session $sessionId).id
 
-	start $sessionId false
+	start $sessionId
 	verify-active $sessionId
 	print ""
 	ssh-into-session-vm $sessionId

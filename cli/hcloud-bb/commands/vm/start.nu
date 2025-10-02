@@ -9,11 +9,11 @@ use ($CLI_COMMANDS_DIR)/list
 
 const SCRIPT_DIR = path self .
 
-export def main [sessionId: string, startingBuild: bool]: nothing -> string {
+export def main [sessionId: string, mandatoryVmType?: oneof<string, nothing>]: nothing -> string {
 	set-up-hcloud-context
 
 	try {
-		let action = get-needed-action $sessionId $startingBuild
+		let action = get-needed-action $sessionId $mandatoryVmType
 
 		# Make sure the status is set to ACTIVE before we actually change
 		# the state of a, so that it can't get pruned
@@ -34,11 +34,10 @@ export def main [sessionId: string, startingBuild: bool]: nothing -> string {
 
 # Does all the needed prep work to figure out what needs to happen, without actually
 # updating the state of the VM (that's the responsibility of the returned closure).
-def get-needed-action [$sessionId: string, startingBuild: bool]: nothing -> closure {
+def get-needed-action [$sessionId: string, mandatoryVmType: oneof<string, nothing>]: nothing -> closure {
 	let session = get-session $sessionId
 	let sessionId: string = $session.id
 	let resourcesName = $session.resourcesName
-	let desiredVmType: string = get-desired-vm-type $session.type $startingBuild
 
 	print "Getting list of existing VMs"
 	let existingVm: oneof<record, nothing> = (
@@ -48,16 +47,42 @@ def get-needed-action [$sessionId: string, startingBuild: bool]: nothing -> clos
 	)
 
 	if $existingVm != null {
-		# We can only reuse existing VMs if they match our
-		# desired type or we are NOT about to start a build
-		if $existingVm.server_type.name == $desiredVmType or not $startingBuild {
+		# We can only reuse existing VMs if there is either no mandatory type or the existing VM matches it
+		if $mandatoryVmType == null or $existingVm.server_type.name == $mandatoryVmType {
 			return { reuse-existing-vm $existingVm }
 		}
 	}
 
+	let selectedVmType: string = (
+		if $mandatoryVmType == null {
+			prompt-for-vm-type
+		} else {
+			$mandatoryVmType
+		}
+	)
+
+	confirm-vm-creation $selectedVmType $existingVm
+
+	# Return closure that will be run later
+	{
+		if $existingVm != null {
+			# It's critical that we do NOT change the session's status, so we must use `hcloud` directly
+
+			print "Shutting down existing VM"
+			hcloud server shutdown --wait=true --wait-timeout 120s --quiet $existingVm.id
+
+			print "Deleting existing VM"
+			hcloud server delete $existingVm.id
+		}
+
+		create-vm $session $selectedVmType
+	}
+}
+
+def confirm-vm-creation [vmType: string, existingVm: oneof<record, nothing>]: nothing -> nothing {
 	print "Fetching VM type details"
 	let vmTypeDetails = (
-		hcloud server-type describe --output json $desiredVmType
+		hcloud server-type describe --output json $vmType
 		| from json
 		| internal make-friendly vm-type $VM_LOCATION
 	)
@@ -73,34 +98,12 @@ def get-needed-action [$sessionId: string, startingBuild: bool]: nothing -> clos
 	if not $confirmed {
 		error make { msg: "User did not confirm VM creation" }
 	}
-
-	{ # Return closure
-		if $existingVm != null {
-			# It's critical that we do NOT change the session's status, so we must use `hcloud` directly
-
-			print "Shutting down existing VM"
-			hcloud server shutdown --wait=true --wait-timeout 120s --quiet $existingVm.id
-
-			print "Deleting existing VM"
-			hcloud server delete $existingVm.id
-		}
-
-		create-vm $session $desiredVmType $startingBuild
-	}
 }
 
-def get-desired-vm-type [sessionType: string, startingBuild: bool]: nothing -> string {
-	if $sessionType == $SESSION_TYPE_TEST_ONLY {
-		$VM_TYPE_TEST_INVESTIGATE
-	} else if $sessionType == $SESSION_TYPE_GRAPHENE {
-		if $startingBuild {
-			$VM_TYPE_BUILD_GRAPHENE
-		} else {
-			$VM_TYPE_TEST_INVESTIGATE
-		}
-	} else {
-		error make { msg: $"Unrecognized session type: ($sessionType)" }
-	}
+def prompt-for-vm-type []: nothing -> string {
+	list vm-types
+	| input list --fuzzy "Which type of VM would you like to create?"
+	| get name
 }
 
 def reuse-existing-vm [vm: record]: nothing -> nothing {
@@ -115,7 +118,7 @@ def reuse-existing-vm [vm: record]: nothing -> nothing {
 	}
 }
 
-def create-vm [session: record, vmType: string, startingBuild: bool]: nothing -> nothing {
+def create-vm [session: record, vmType: string]: nothing -> nothing {
 	let resourcesName: string = $session.resourcesName
 	let volumeDevPath: string = $session.volumeDevPath
 	let ipv4Address: string = $session.ipv4Address

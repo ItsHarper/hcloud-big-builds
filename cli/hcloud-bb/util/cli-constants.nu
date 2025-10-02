@@ -11,7 +11,6 @@ export const VOLUME_FS = "ext4"
 
 export const VOLUME_SIZE_TEST_ONLY_SESSION_GiB = 10
 export const VOLUME_SIZE_GRAPHENE_SESSION_GiB = 400
-export const VM_TYPE_TEST_INVESTIGATE = "cpx11"
 export const VM_TYPE_BUILD_GRAPHENE = "ccx63" # TODO(Harper): Compare costs for different tiers
 
 # Other
