@@ -10,8 +10,8 @@ export const VM_LOCATION = "nbg1" # Nuremburg, Germany
 export const VM_DATACENTER = $"($VM_LOCATION)-dc3" # Use `hcloud datacenter list`
 export const VOLUME_FS = "ext4"
 
-export const VOLUME_SIZE_TEST_ONLY_SESSION_GiB = 10
-export const VOLUME_SIZE_GRAPHENE_SESSION_GiB = 375
+export const VOLUME_SIZE_GB_TEST_ONLY = 10
+export const VOLUME_SIZE_GB_GRAPHENE = 375
 export const VM_MIN_RAM_GiB_GRAPHENE = 64
 
 # Other
