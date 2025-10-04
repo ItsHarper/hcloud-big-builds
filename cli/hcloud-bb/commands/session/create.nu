@@ -3,7 +3,7 @@ use ../../util/cli-constants.nu *
 use ($CLI_UTIL_DIR)/hcloud-context-management.nu *
 use ($CLI_UTIL_DIR)/hcloud-wrapper.nu *
 use ($CLI_UTIL_DIR)/state.nu *
-use ($CLI_COMMANDS_DIR)/vm
+use ($CLI_COMMANDS_DIR)/session/run-build.nu
 
 const SCRIPT_DIR = path self .
 
@@ -63,16 +63,14 @@ export def main []: nothing -> record {
 	let ipv4Info = $ipResponse.body.primary_ip
 
 	save-new-session $sessionId $sessionType $resourcesName $volumeInfo.volume.linux_device $ipv4Info.ip
+	print $"Successfully created session"
 
 	try {
-		let mandatoryVmType = if $sessionType == $SESSION_TYPE_TEST_ONLY {
-			null
-		} else {
-			$VM_TYPE_BUILD_GRAPHENE
-		}
-		vm start $sessionId $mandatoryVmType
+		print "Starting build"
+		run-build $sessionId
+		print "Build succeeded"
 	} catch {|e|
-		print -e "Failed to start VM (session is still valid):"
+		print -e "Build failed (session is still valid):"
 		print -e $e.rendered
 		# Don't throw an error, the session was still created successfully.
 	}
