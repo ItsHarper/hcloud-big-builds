@@ -107,7 +107,7 @@ def confirm-vm-creation [vmType: string, existingVm: oneof<record, nothing>]: no
 	}
 }
 
-def prompt-for-vm-type [vmConstraint?: closure]: nothing -> string {
+def prompt-for-vm-type [vmConstraint: closure]: nothing -> string {
 	list vm-types
 	| where $vmConstraint
 	| input list --fuzzy "Which type of VM would you like to create?"
