@@ -18,17 +18,8 @@ try {
 
 	run-build-graphene $runPreparation
 	print "Finished build"
-	schedule-shutdown
 } catch {|e|
-	print -e "vm-run-build.nu failed:"
+	print -e "Build failed:"
 	print -e $e.rendered
-	schedule-shutdown
 	exit 1
-}
-
-def schedule-shutdown []: nothing -> nothing {
-	print "Shutting down VM in 5 minutes"
-	print "Cancel using `atrm <jobNumber>` (the job number will be listed below)"
-	# We're using at instead of the functionality built into shutdown to make sure logins continue to be allowed
-	"sudo shutdown now" | at now + 5 minutes
 }

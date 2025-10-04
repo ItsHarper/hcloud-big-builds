@@ -19,5 +19,14 @@ export def main [
 	vm start $sessionId $vmConstraint
 
 	print "Running vm-run-build.nu script on VM"
-	ssh-into-session-vm --command $"($RUN_NUSHELL_SCRIPT_VM_PATH) vm-run-build.nu" $sessionId
+	try {
+		ssh-into-session-vm --command $"($RUN_NUSHELL_SCRIPT_VM_PATH) vm-run-build.nu" $sessionId
+		print $"Marking session as ($SESSION_STATUS_READY)"
+		update-session-status $sessionId $SESSION_STATUS_READY
+	} catch {|e|
+		print -e $e.rendered
+		print $"Marking session as ($SESSION_STATUS_READY)"
+		update-session-status $sessionId $SESSION_STATUS_READY
+		error make { msg: "Build failed" }
+	}
 }
