@@ -11,5 +11,5 @@ export def main [sessionId?: string]: nothing -> nothing {
 	delete-session $sessionId
 
 	print "Running `prune`"
-	prune
+	print (prune | table --expand)
 }

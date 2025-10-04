@@ -19,6 +19,7 @@ export const CLI_UTIL_DIR = path self .
 export const CLI_COMMANDS_DIR = path self ../commands
 export const INTERNAL_COMMAND_PATH = ($CLI_COMMANDS_DIR)/internal
 export const COMMON_CONSTANTS_PATH = path self ../../../common/common-constants.nu
+export const PRUNE_LOG_PATH = path self ../../../.prune-log.json
 export const CURRENCY_PER_HOUR = $"($PROJECT_CURRENCY)/hr"
 
 export const HCLOUD_CONFIG_FILENAME = "hcloud-cli.toml"

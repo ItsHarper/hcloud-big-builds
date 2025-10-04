@@ -6,7 +6,7 @@ use ($CLI_COMMANDS_DIR)/list
 
 const SYNTHETIC_SESSION_STATUS_ZOMBIE = "ZOMBIE"
 
-export def main []: nothing -> nothing {
+export def main []: nothing -> record {
 	set-up-hcloud-context
 	let sessions = list sessions
 
@@ -23,14 +23,35 @@ export def main []: nothing -> nothing {
 
 	# Refresh sessions to reflect any changes made in the previous step
 	let sessions = list sessions
+
 	let vms = list vms | add-session-status-column $sessions
+	let vmDeletionFilter = {|vm|
+		$vm.sessionStatus != $SESSION_STATUS_ACTIVE
+	}
+	let vmDeleter = {|vm|
+		if $vm.status == "running" {
+			hcloud server poweroff $vm.id
+		}
+		hcloud server delete $vm.id
+	}
+	let vmResults = prune-resouce-type "VM" $vms $vmDeletionFilter $vmDeleter
+
 	let volumes: table = (
 		hcloud volume list --output json
 		| from json
 		| default []
 		| update created {|volume| $volume.created | into datetime }
 		| add-session-status-column $sessions
+		| select name sessionStatus status size format created id
 	)
+	let volumeDeletionFilter = {|volume|
+		$volume.sessionStatus == $SYNTHETIC_SESSION_STATUS_ZOMBIE
+	}
+	let volumeDeleter = {|volume|
+		hcloud volume delete $volume.id
+	}
+	let volumeResults = prune-resouce-type "volume" $volumes $volumeDeletionFilter $volumeDeleter
+
 	let primaryIps: table = (
 		hcloud primary-ip list --output json
 		| from json
@@ -39,85 +60,62 @@ export def main []: nothing -> nothing {
 		| add-session-status-column $sessions
 		# auto-deleted IPs aren't relevant
 		| where auto_delete == false
+		| select name sessionStatus ip type created id
 	)
+	let primaryIpDeletionFilter = {|primaryIp|
+		$primaryIp.sessionStatus == $SYNTHETIC_SESSION_STATUS_ZOMBIE
+	}
+	let primaryIpDeleter = {|primaryIp|
+		hcloud primary-ip delete $primaryIp.id
+	}
+	let primaryIpResults = prune-resouce-type "primary IP" $primaryIps $primaryIpDeletionFilter $primaryIpDeleter
 
-	let vmsToDelete = (
-		$vms
-		| where sessionStatus != $SESSION_STATUS_ACTIVE
-	)
-	let volumesToDelete: table = (
-		$volumes
-		| where sessionStatus == $SYNTHETIC_SESSION_STATUS_ZOMBIE
-	)
-	let primaryIpsToDelete: table = (
-		$primaryIps
-		| where sessionStatus == $SYNTHETIC_SESSION_STATUS_ZOMBIE
-	)
-
-	print "VMs:"
-	print (
-		$vms
-		| table --expand
-	)
-
-	print "VMs to delete:"
-	print (
-		$vmsToDelete
-		| table --expand
-	)
-
-	print "Volumes:"
-	print (
-		$volumes
-		| select name sessionStatus id status server size format created
-		| table --expand
-	)
-
-	print "Volumes to delete:"
-	print (
-		$volumesToDelete
-		| select name sessionStatus id status server size format created
-		| table --expand
-	)
-
-	print "Primary IP addresses:"
-	print (
-		$primaryIps
-		| select name sessionStatus ip id type assignee_id created
-		| table --expand
-	)
-
-	print "Primary IP addresses to delete:"
-	print (
-		$primaryIpsToDelete
-		| select name sessionStatus ip id type assignee_id created
-		| table --expand
-	)
-
-	$vmsToDelete
-	| each {|vm|
-		if $vm.status == "running" {
-			print $"Powering off VM ($vm.name)"
-			hcloud server poweroff $vm.id
-		}
-
-		print $"Deleting VM ($vm.name)"
-		hcloud server delete $vm.id
+	let result = {
+		timestamp: (date now)
+		vms: $vmResults
+		volumes: $volumeResults
+		primaryIps: $primaryIpResults
 	}
 
-	$volumesToDelete
-	| each {|volume|
-		print $"Deleting volume ($volume.name)"
-		hcloud volume delete $volume.id
+	touch $PRUNE_LOG_PATH
+	open $PRUNE_LOG_PATH
+	| default []
+	| append $result
+	| collect
+	| save -f $PRUNE_LOG_PATH
+
+	$result
+	| reject timestamp
+}
+
+export def log []: nothing -> nothing {
+	open $PRUNE_LOG_PATH
+	| default []
+	| each {|logEntry|
+		print $"\n($logEntry.timestamp | into datetime)"
+		print ($logEntry | reject timestamp | table --expand)
+	}
+	| ignore
+}
+
+def prune-resouce-type [resourceTypeName: string, resources: table, deletionFilter: closure, deleter: closure]: nothing -> record {
+	let toDelete = (
+		$resources | where $deletionFilter
+	)
+	let toKeep = (
+		$resources | where not (do $deletionFilter $it)
+	)
+
+	$toDelete
+	| each {|resource|
+		print $"Deleting ($resourceTypeName) ($resource.name)"
+		do $deleter $resource
 	}
 
-	$primaryIpsToDelete
-	| each {|ip|
-		print $"Deleting primary IP address ($ip.name) \(($ip.ip)\)"
-		hcloud primary-ip delete $ip.id
+	{
+		kept: $toKeep
+		deleted: $toDelete
 	}
-
-	null
 }
 
 # Accepts and returns a table of resources
