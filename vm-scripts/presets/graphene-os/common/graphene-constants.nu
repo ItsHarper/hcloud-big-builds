@@ -5,10 +5,11 @@ export const DOWNLOAD_STABLE = true
 export const BUILD_VARIANT = "userdebug"
 export const PIXEL_BUILD_TARGETS = [
 	# "oriole" # Pixel 6
-	"shiba" # Pixel 8
+	"bluejay" # Pixel 6a
+	# "shiba" # Pixel 8
 ]
 export const BUILD_TARGETS = [
-	"sdk_phone64_x86_64" # Emulator
+	# "sdk_phone64_x86_64" # Emulator
 	...$PIXEL_BUILD_TARGETS
 ]
 
