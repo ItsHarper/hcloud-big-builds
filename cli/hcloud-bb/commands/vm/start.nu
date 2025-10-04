@@ -9,11 +9,14 @@ use ($CLI_COMMANDS_DIR)/list
 
 const SCRIPT_DIR = path self .
 
-export def main [sessionId: string, mandatoryVmType?: oneof<string, nothing>]: nothing -> string {
+# vmConstraint accepts a VM record and returns a bool that indicates if the
+# VM is suitable
+export def main [sessionId: string, vmConstraint?: closure]: nothing -> string {
 	set-up-hcloud-context
+	let vmConstraint = $vmConstraint | default { {|vm| true} }
 
 	try {
-		let action = get-needed-action $sessionId $mandatoryVmType
+		let action = get-needed-action $sessionId $vmConstraint
 
 		# Make sure the status is set to ACTIVE before we actually change
 		# the state of a, so that it can't get pruned
@@ -34,7 +37,7 @@ export def main [sessionId: string, mandatoryVmType?: oneof<string, nothing>]: n
 
 # Does all the needed prep work to figure out what needs to happen, without actually
 # updating the state of the VM (that's the responsibility of the returned closure).
-def get-needed-action [$sessionId: string, mandatoryVmType: oneof<string, nothing>]: nothing -> closure {
+def get-needed-action [$sessionId: string, vmConstraint: closure]: nothing -> closure {
 	let session = get-session $sessionId
 	let sessionId: string = $session.id
 	let resourcesName = $session.resourcesName
@@ -47,19 +50,13 @@ def get-needed-action [$sessionId: string, mandatoryVmType: oneof<string, nothin
 	)
 
 	if $existingVm != null {
-		# We can only reuse existing VMs if there is either no mandatory type or the existing VM matches it
-		if $mandatoryVmType == null or $existingVm.server_type.name == $mandatoryVmType {
+		# We can only reuse existing VMs if there is either no constraint or the existing VM matches it
+		if $vmConstraint == null or (do $vmConstraint $existingVm) {
 			return { reuse-existing-vm $existingVm }
 		}
 	}
 
-	let selectedVmType: string = (
-		if $mandatoryVmType == null {
-			prompt-for-vm-type
-		} else {
-			$mandatoryVmType
-		}
-	)
+	let selectedVmType: string = (prompt-for-vm-type $vmConstraint)
 
 	confirm-vm-creation $selectedVmType $existingVm
 
@@ -100,8 +97,9 @@ def confirm-vm-creation [vmType: string, existingVm: oneof<record, nothing>]: no
 	}
 }
 
-def prompt-for-vm-type []: nothing -> string {
+def prompt-for-vm-type [vmConstraint?: closure]: nothing -> string {
 	list vm-types
+	| where $vmConstraint
 	| input list --fuzzy "Which type of VM would you like to create?"
 	| get name
 }

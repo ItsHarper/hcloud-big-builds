@@ -11,8 +11,8 @@ export const VM_DATACENTER = $"($VM_LOCATION)-dc3" # Use `hcloud datacenter list
 export const VOLUME_FS = "ext4"
 
 export const VOLUME_SIZE_TEST_ONLY_SESSION_GiB = 10
-export const VM_TYPE_BUILD_GRAPHENE = "ccx63" # TODO(Harper): Compare costs for different tiers
 export const VOLUME_SIZE_GRAPHENE_SESSION_GiB = 375
+export const VM_MIN_RAM_GiB_GRAPHENE = 64
 
 # Other
 export const CLI_UTIL_DIR = path self .
