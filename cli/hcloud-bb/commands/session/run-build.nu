@@ -17,7 +17,6 @@ export def main [
 	}
 
 	vm start $sessionId $vmConstraint
-	vm sync-scripts $sessionId
 
 	print "Running vm-run-build.nu script on VM"
 	ssh-into-session-vm --command $"($RUN_NUSHELL_SCRIPT_VM_PATH) vm-run-build.nu" $sessionId

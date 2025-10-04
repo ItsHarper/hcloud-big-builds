@@ -14,16 +14,27 @@ const SCRIPT_DIR = path self .
 export def main [sessionId: string, vmConstraint?: closure]: nothing -> string {
 	set-up-hcloud-context
 	let vmConstraint = $vmConstraint | default { {|vm| true} }
+	let session = get-session $sessionId
 
 	try {
-		let action = get-needed-action $sessionId $vmConstraint
+		let action = get-needed-action $session $vmConstraint
 
 		# Make sure the status is set to ACTIVE before we actually change
-		# the state of a, so that it can't get pruned
+		# the state of a VM, so that it can't get pruned
 		print $"Marking session as ($SESSION_STATUS_ACTIVE)"
 		update-session-status $sessionId $SESSION_STATUS_ACTIVE
 
 		do $action
+
+		wait-for-vm-ping $session.ipv4Address
+		# TODO(Harper): If the ping took more than a second, try making a no-op
+		#               SSH connection a few times. Sometimes it starts responding
+		#               to pings before the SSH server is ready.
+
+		print "Syncing scripts to VM"
+		rsync-to-session-vm $TOP_LEVEL_COMMON_DIR $HCLOUD_BB_VM_DIR $sessionId
+		rsync-to-session-vm $VM_SCRIPTS_DIR $HCLOUD_BB_VM_DIR $sessionId
+		rsync-to-session-vm ($VM_CONFIG_DIR)/ /home/($VM_USERNAME)/.config $sessionId
 	} catch {|e|
 		print -e "Failed to start VM:"
 		print -e $e.rendered
@@ -37,8 +48,7 @@ export def main [sessionId: string, vmConstraint?: closure]: nothing -> string {
 
 # Does all the needed prep work to figure out what needs to happen, without actually
 # updating the state of the VM (that's the responsibility of the returned closure).
-def get-needed-action [$sessionId: string, vmConstraint: closure]: nothing -> closure {
-	let session = get-session $sessionId
+def get-needed-action [session: record, vmConstraint: closure]: nothing -> closure {
 	let sessionId: string = $session.id
 	let resourcesName = $session.resourcesName
 
@@ -192,4 +202,35 @@ AllowAgentForwarding no
 			[ "chmod" "777" $BUILD_ROOT_VM_DIR ]
 		]
 	}
+}
+
+def wait-for-vm-ping [ipAddress: string]: nothing -> nothing {
+	let startTime = date now
+	let timeoutDuration = 2min
+
+	print "Connecting to VM"
+	mut pingSucceeded = ping $ipAddress
+	let initialPingSucceeded = $pingSucceeded
+
+	if not $pingSucceeded {
+		print "Waiting for VM to respond to our pings"
+	}
+
+	while ((not $pingSucceeded) and ((date now) - $startTime) < $timeoutDuration) {
+		sleep 200ms
+		$pingSucceeded = ping $ipAddress
+	}
+
+	if not $pingSucceeded {
+		error make { msg: $"Timed out after ($timeoutDuration) of waiting for VM to respond to our pings" }
+	}
+	if not $initialPingSucceeded {
+		print $"VM responded after (((date now) - $startTime) | format duration sec)"
+	}
+}
+
+def ping [ipAddress: string]: nothing -> bool {
+	^ping -c 1 $ipAddress
+	| complete
+	| $in.exit_code == 0
 }

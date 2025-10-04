@@ -1,8 +1,6 @@
 export module ./shell.nu
 export module ./start.nu
 export module ./stop.nu
-export module ./sync-scripts.nu
-export module ./verify-active.nu
 
 # TODO(Harper): Move to `commands/internal`
 export def main []: nothing -> nothing {
@@ -17,8 +15,6 @@ export def main []: nothing -> nothing {
 		"shell"
 		"start"
 		"stop"
-		"sync-scripts"
-		"verify-active"
 	]
 	| each { print $"  hcloud-bb vm ($in)"}
 	| ignore

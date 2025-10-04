@@ -1,7 +1,6 @@
 use ../../util/cli-constants.nu *
 use ($CLI_UTIL_DIR)/state.nu *
 use ($CLI_COMMANDS_DIR)/prune.nu
-use ($CLI_COMMANDS_DIR)/vm/verify-active.nu
 
 export def main [
 	--force
