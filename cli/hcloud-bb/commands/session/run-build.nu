@@ -7,7 +7,7 @@ use ($CLI_COMMANDS_DIR)/vm
 export def main [
 	--ignore-minimium-ram
 	sessionId?: string
-]: nothing -> string {
+]: nothing -> nothing {
 	let sessionId: string = (get-session $sessionId).id
 	let vmConstraint = {|vm|
 		(
@@ -20,6 +20,4 @@ export def main [
 
 	print "Running vm-run-build.nu script on VM"
 	ssh-into-session-vm --command $"($RUN_NUSHELL_SCRIPT_VM_PATH) vm-run-build.nu" $sessionId
-
-	$sessionId
 }
