@@ -32,34 +32,11 @@ export def main []: nothing -> record {
 	)
 
 	print "Creating IPv4 address"
-	# TODO(Harper): Switch back to hcloud cli once they fix this command
-	# let ipv4Info: record = (
-	# 	hcloud primary-ip create --name $resourcesName --datacenter $VM_DATACENTER --type ipv4 --auto-delete=false
-	# 	| from json
-	# )
-
-	let token: string = (
-		open (get-config-dir)/($HCLOUD_CONFIG_FILENAME)
-		| get contexts
-		| iter only
-		| get token
+	let ipv4Info: record = (
+		hcloud primary-ip create --name $resourcesName --datacenter $VM_DATACENTER --type ipv4 --auto-delete=false --output json
+		| from json
+		| get primary_ip
 	)
-	let ipResponse = (
-		{
-			name: $resourcesName
-			type: "ipv4"
-			datacenter: "nbg1-dc3"
-			assignee_type: "server"
-			auto_delete: false
-		}
-		| http post --allow-errors --full --headers { Authorization: $"Bearer ($token)" } --content-type application/json "https://api.hetzner.cloud/v1/primary_ips"
-	)
-	if $ipResponse.status < 200 or $ipResponse.status >= 300 {
-		print -e "Full IP creation response:"
-		print -e ($ipResponse | table --expand)
-		error make { msg: $"Hetzner responded with error code ($ipResponse.status)" }
-	}
-	let ipv4Info = $ipResponse.body.primary_ip
 
 	save-new-session $sessionId $sessionType $resourcesName $volumeInfo.volume.linux_device $ipv4Info.ip
 	print $"Successfully created session"
