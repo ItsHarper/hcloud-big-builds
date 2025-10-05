@@ -7,7 +7,7 @@ use ($CLI_COMMANDS_DIR)/session/run-build.nu
 
 const SCRIPT_DIR = path self .
 
-export def main []: nothing -> record {
+export def main [--no-build]: nothing -> record {
 	set-up-hcloud-context
 
 	let sessionTypeInfo: record = (
@@ -41,14 +41,16 @@ export def main []: nothing -> record {
 	save-new-session $sessionId $sessionType $resourcesName $volumeInfo.volume.linux_device $ipv4Info.ip
 	print $"Successfully created session"
 
-	try {
-		print "Starting build"
-		run-build $sessionId
-		print "Build succeeded"
-	} catch {|e|
-		print -e "Build failed (session is still valid):"
-		print -e $e.rendered
-		# Don't throw an error, the session was still created successfully.
+	if not $no_build {
+		try {
+			print "Starting build"
+			run-build $sessionId
+			print "Build succeeded"
+		} catch {|e|
+			print -e "Build failed (session is still valid):"
+			print -e $e.rendered
+			# Don't throw an error, the session was still created successfully.
+		}
 	}
 
 	print $"Created session ($sessionId)"
