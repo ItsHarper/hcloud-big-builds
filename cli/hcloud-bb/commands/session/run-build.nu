@@ -9,14 +9,14 @@ export def main [
 	sessionId?: string
 ]: nothing -> nothing {
 	let sessionId: string = (get-session $sessionId).id
-	let vmConstraint = {|vm|
+	let vmTypeConstraint = {|vm|
 		(
 			$vm.cpu_type == "dedicated" and
 			($ignore_minimium_ram or $vm.memory >= $VM_MIN_RAM_GiB_GRAPHENE)
 		)
 	}
 
-	vm start $sessionId $vmConstraint
+	vm start $sessionId $vmTypeConstraint
 
 	print "Running vm-run-build.nu script on VM"
 	try {
