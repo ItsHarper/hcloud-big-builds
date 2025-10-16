@@ -34,7 +34,7 @@ export def main []: nothing -> record {
 	}
 	let vmDeleter = {|vm|
 		if $vm.status == "running" {
-			hcloud server poweroff $vm.id
+			hcloud server shutdown --wait-timeout 90s $vm.id
 		}
 		hcloud server delete $vm.id
 	}
