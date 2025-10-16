@@ -9,11 +9,12 @@ export def main [
 	--ignore-minimium-ram
 	sessionId?: string
 ]: nothing -> nothing {
-	let sessionId: string = (get-session $sessionId).id
+	let session = get-session $sessionId
+	let sessionId: string = $session.id
 	let vmTypeConstraint = {|vm|
 		(
 			$vm.cpu_type == "dedicated" and
-			($ignore_minimium_ram or $vm.memory >= $VM_MIN_RAM_GiB_GRAPHENE)
+			($ignore_minimium_ram or $vm.memory >= $session.type.minRamGiB)
 		)
 	}
 

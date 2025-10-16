@@ -10,17 +10,11 @@ const SCRIPT_DIR = path self .
 export def main [--no-build]: nothing -> record {
 	set-up-hcloud-context
 
-	let sessionTypeInfo: record = (
-		[
-			[description sessionTypeInfo];
-			["GrapheneOS" { type: $SESSION_TYPE_GRAPHENE, volumeSizeGB: $VOLUME_SIZE_GB_GRAPHENE }]
-			["Testing only" { type: $SESSION_TYPE_TEST_ONLY, volumeSizeGB: $VOLUME_SIZE_GB_GRAPHENE }]
-		]
+	let sessionType: record = (
+		$SESSION_TYPES
 		| input list -d description "Select session type"
-		| get sessionTypeInfo
 	)
-	let sessionType: string = $sessionTypeInfo.type
-	let volumeSizeGB: int = $sessionTypeInfo.volumeSizeGB
+	let volumeSizeGB: int = $sessionType.volumeSizeGB
 
 	let sessionId = random chars --length 7
 	let resourcesName = ($RESOURCES_NAME_PREFIX)-($sessionId)

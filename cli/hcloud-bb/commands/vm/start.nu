@@ -182,7 +182,7 @@ def generate-cloud-init-config [session: record<id: string, volumeDevPath: strin
 			{
 				path: /etc/motd
 				permissions: '0644'
-				content: $"($vmImage) VM \(type ($vmType)\) for ($session.type) session ($sessionId)"
+				content: $"($vmImage) VM \(type ($vmType)\) for ($session.type.id) session ($sessionId)"
 			},
 			{
 				path: /etc/ssh/sshd_config.d/10-ssh-hardening.conf

@@ -1,3 +1,4 @@
+export module ./session-types.nu
 export module ./sessions.nu
 export module ./vm-types.nu
 export module ./vms.nu
@@ -7,6 +8,7 @@ export def main []: nothing -> nothing {
 
 	print "Subcommands: "
 	[
+		"session-types"
 		"sessions"
 		"vm-types"
 		"vms"

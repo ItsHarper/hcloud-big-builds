@@ -7,15 +7,10 @@ export const PROJECT_CURRENCY = "$" # TODO(Harper): Get this from the API
 export const RESOURCES_NAME_PREFIX = $CONTEXT_NAME
 export const TAG_NAME = $CONTEXT_NAME
 
-# TODO(Harper): Verify that Debian 13 doesn't give us issues
 export const VM_IMAGE = "debian-13"
 export const VM_LOCATION = "nbg1" # Nuremburg, Germany
 export const VM_DATACENTER = $"($VM_LOCATION)-dc3" # Use `hcloud datacenter list`
 export const VOLUME_FS = "ext4"
-
-export const VOLUME_SIZE_GB_TEST_ONLY = 10
-export const VOLUME_SIZE_GB_GRAPHENE = 375
-export const VM_MIN_RAM_GiB_GRAPHENE = 64
 
 # Other
 export const CLI_UTIL_DIR = path self .
@@ -30,6 +25,21 @@ export const CONFIG_DIR_GITIGNORE_CONTENTS = $"
 # Contains references to local-only SSH keys and potentially even actual credentials
 ($HCLOUD_CONFIG_FILENAME)
 "
+
+export const SESSION_TYPES: table<id: string, description: string, volumeSizeGB: int, minRamGiB: int> = [
+	{
+		id: "graphene-os"
+		description: "GrapheneOS"
+		volumeSizeGB: 375
+		minRamGiB: 64
+	}
+	{
+		id: "test-only"
+		description: "Testing only"
+		volumeSizeGB: 10
+		minRamGiB: 0
+	}
+]
 
 export def get-config-dir []: nothing -> string {
 	let result = (
