@@ -27,9 +27,13 @@ export def main []: nothing -> record {
 	let vms = list vms | add-session-status-column $sessions
 	let vmDeletionFilter = {|vm|
 		(
-			$vm.sessionStatus != $SESSION_STATUS_ACTIVE and
-			# Only delete VMs that are about to be billed for another hour
-			($vm.running mod 1hr) > 53min
+			# Delete zombies right away (the user has asserted that they're done)
+			$vm.sessionStatus == $SYNTHETIC_SESSION_STATUS_ZOMBIE
+			or (
+				# Delete non-zombies right before they get billed for another hour
+				$vm.sessionStatus != $SESSION_STATUS_ACTIVE and
+				($vm.running mod 1hr) > 53min
+			)
 		)
 	}
 	let vmDeleter = {|vm|
