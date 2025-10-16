@@ -19,11 +19,16 @@ export def main [
 	if $full {
 		$fullList
 	} else {
-
 		let friendlyList = (
 			$fullList
 			| where $include_non_x86 or $it.architecture == "x86"
-			# | sort-by cpu_type
+			| where {|vmType|
+				(
+					$vmType.prices
+					| where location == $VM_LOCATION
+					| length
+				) > 0
+			}
 			| each { internal make-friendly vm-type $VM_LOCATION $additionalFields }
 			| sort-by --reverse ([$CURRENCY_PER_HOUR] | into cell-path)
 			| sort-by --reverse memory
