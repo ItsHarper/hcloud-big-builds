@@ -5,4 +5,7 @@ export def main []: nothing -> table {
 	open (get-sessions-path)
 	| values
 	| reject volumeDevPath
+	| update type {|session|
+		$session.type.description
+	}
 }
