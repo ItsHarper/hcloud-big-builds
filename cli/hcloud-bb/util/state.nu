@@ -7,7 +7,7 @@ export const SESSION_STATUS_ACTIVE = "ACTIVE" # Has VM
 
 export def save-new-session [
 	id: string
-	type: record<id: string, description: string, volumeSizeGB: int, minRamGiB: int>
+	type: record<id: string, description: string, volumeSizeGB: int, minRamGiB: int, outputsToDownload: table<vmRelativePath: string, localRelativePath: string>>
 	resourcesName: string
 	volumeDevPath: string
 	ipv4Address: string
@@ -33,7 +33,7 @@ export def save-new-session [
 	| save -f $sessionsPath
 }
 
-export def get-session [id?: string]: nothing -> record<id: string, status: string, type: record<id: string, description: string, volumeSizeGB: int, minRamGiB: int>, resourcesName: string, volumeDevPath: string, ipv4Address: string, sshKeysDir: string> {
+export def get-session [id?: string]: nothing -> record<id: string, status: string, type: record, resourcesName: string, volumeDevPath: string, ipv4Address: string, sshKeysDir: string> {
 	let sessions = open (get-sessions-path)
 	if $id == null {
 		$sessions | values | iter only

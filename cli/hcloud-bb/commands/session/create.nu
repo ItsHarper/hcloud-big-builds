@@ -11,7 +11,7 @@ export def main [--no-build]: nothing -> record {
 	set-up-hcloud-context
 
 	let sessionType: record = (
-		$SESSION_TYPES
+		get-session-types
 		| input list -d description "Select session type"
 	)
 	let volumeSizeGB: int = $sessionType.volumeSizeGB

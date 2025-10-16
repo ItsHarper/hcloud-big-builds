@@ -26,20 +26,36 @@ export const CONFIG_DIR_GITIGNORE_CONTENTS = $"
 ($HCLOUD_CONFIG_FILENAME)
 "
 
-export const SESSION_TYPES: table<id: string, description: string, volumeSizeGB: int, minRamGiB: int> = [
-	{
-		id: "graphene-os"
-		description: "GrapheneOS"
-		volumeSizeGB: 375
-		minRamGiB: 64
-	}
-	{
-		id: "test-only"
-		description: "Testing only"
-		volumeSizeGB: 10
-		minRamGiB: 0
-	}
-]
+export def get-session-types []: nothing -> table<id: string, description: string, volumeSizeGB: int, minRamGiB: int, outputsToDownload: table<vmRelativePath: string, localRelativePath: string>>  {
+	[
+		{
+			id: "graphene-os"
+			description: "GrapheneOS"
+			volumeSizeGB: 375
+			minRamGiB: 64,
+			outputsToDownload: (
+				$GRAPHENE_BUILD_TARGETS
+				| each {|buildTarget|
+					let localTargetDir = $"($buildTarget)/" # The trailing slash tells rsync to put the files in the folder, instead of giving them the folder's name
+					let vmTargetDir = $"out/target/product/($buildTarget)"
+					[
+						{ vmRelativePath: ($vmTargetDir)/*.img, localRelativePath: $localTargetDir }
+						{ vmRelativePath: ($vmTargetDir)/fastboot-info.txt, localRelativePath: $localTargetDir }
+						{ vmRelativePath: ($vmTargetDir)/android-info.txt, localRelativePath: $localTargetDir }
+					]
+				}
+				| flatten
+			)
+		}
+		{
+			id: "test-only"
+			description: "Testing only"
+			volumeSizeGB: 10
+			minRamGiB: 0
+			outputsToDownload: []
+		}
+	]
+}
 
 export def get-config-dir []: nothing -> string {
 	let result = (

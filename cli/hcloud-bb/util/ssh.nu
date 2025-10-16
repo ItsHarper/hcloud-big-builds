@@ -42,13 +42,13 @@ export def --wrapped ssh-into-session-vm [--command: string, sessionId: string, 
 export def rsync-to-session-vm [src: string, dest: string, sessionId: string]: nothing -> nothing {
 	let session = (get-session $sessionId)
 	let ip = $session.ipv4Address
-	rsync --recursive --perms --rsh $"ssh ((get-common-ssh-options $session) | str join ' ')" $src ($VM_USERNAME)@($ip):($dest)
+	rsync --recursive --mkpath --perms --rsh $"ssh ((get-common-ssh-options $session) | str join ' ')" $src ($VM_USERNAME)@($ip):($dest)
 }
 
 export def rsync-from-session-vm [src: string, dest: string, sessionId: string]: nothing -> nothing {
 	let session = (get-session $sessionId)
 	let ip = $session.ipv4Address
-	rsync --recursive --perms --progress --rsh $"ssh ((get-common-ssh-options $session) | str join ' ')" ($VM_USERNAME)@($ip):($src) $dest
+	rsync --recursive --mkpath --perms --progress --rsh $"ssh ((get-common-ssh-options $session) | str join ' ')" ($VM_USERNAME)@($ip):($src) $dest
 }
 
 def get-common-ssh-options [session: record]: nothing -> list<string> {
