@@ -2,6 +2,7 @@ use ../../util/cli-constants.nu *
 use ($COMMON_CONSTANTS_PATH) *
 use ($CLI_UTIL_DIR)/ssh.nu *
 use ($CLI_UTIL_DIR)/state.nu *
+use ($CLI_COMMANDS_DIR)/prune.nu
 use ($CLI_COMMANDS_DIR)/vm
 
 export def main [
@@ -18,18 +19,20 @@ export def main [
 
 	vm start $sessionId $vmTypeConstraint
 
-	print "Running vm-run-build.nu script on VM"
 	try {
+		print "Running vm-run-build.nu script on VM"
 		ssh-into-session-vm --command $"($RUN_NUSHELL_SCRIPT_VM_PATH) vm-run-build.nu" $sessionId
 
 		download-fastboot-outputs $sessionId
 
 		print $"Marking session as ($SESSION_STATUS_READY)"
 		update-session-status $sessionId $SESSION_STATUS_READY
+		prune
 	} catch {|e|
 		print -e $e.rendered
 		print $"Marking session as ($SESSION_STATUS_READY)"
 		update-session-status $sessionId $SESSION_STATUS_READY
+		prune
 		error make { msg: "Build failed" }
 	}
 }
