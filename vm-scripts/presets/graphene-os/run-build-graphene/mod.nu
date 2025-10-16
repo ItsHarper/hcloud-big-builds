@@ -1,4 +1,5 @@
 use ../common/graphene-constants.nu *
+use ($COMMON_CONSTANTS_PATH) *
 use ($GRAPHENE_COMMON_DIR)/sync-graphene-source.nu
 use ($VM_SCRIPTS_CONSTANTS_PATH) *
 use ($VM_SCRIPTS_UTIL_DIR)/perform-build-step.nu
@@ -13,7 +14,7 @@ export def main [preparationJustRan: bool]: nothing -> nothing {
 }
 
 def build []: nothing -> nothing {
-	$BUILD_TARGETS
+	$GRAPHENE_BUILD_TARGETS
 	| each {|buildTarget|
 		$env.BUILD_TARGET = $buildTarget
 		$env.BUILD_VARIANT = $BUILD_VARIANT

@@ -17,7 +17,7 @@ def generate-pixel-vendor-files []: nothing -> nothing {
 		$PREPARE_PIXEL_FILES_SCRIPT_PATH
 	]
 
-	$PIXEL_BUILD_TARGETS
+	$GRAPHENE_PIXEL_BUILD_TARGETS
 	| each {|pixelCodename|
 		$env.PIXEL_CODENAME = $pixelCodename
 		perform-build-step $"Generate vendor files for Pixel: ($pixelCodename)" bash [

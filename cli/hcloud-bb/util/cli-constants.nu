@@ -1,3 +1,6 @@
+export const COMMON_CONSTANTS_PATH = path self ../../../common/common-constants.nu
+use $COMMON_CONSTANTS_PATH *
+
 # Settings
 export const CONTEXT_NAME = "hcloud-bb"
 export const PROJECT_CURRENCY = "$" # TODO(Harper): Get this from the API
@@ -17,8 +20,8 @@ export const VM_MIN_RAM_GiB_GRAPHENE = 64
 # Other
 export const CLI_UTIL_DIR = path self .
 export const CLI_COMMANDS_DIR = path self ../commands
+export const CLI_OUT_DIR = ($HCLOUD_BB_LOCAL_DIR)/out
 export const INTERNAL_COMMAND_PATH = ($CLI_COMMANDS_DIR)/internal
-export const COMMON_CONSTANTS_PATH = path self ../../../common/common-constants.nu
 export const PRUNE_LOG_PATH = path self ../../../.prune-log.json
 export const CURRENCY_PER_HOUR = $"($PROJECT_CURRENCY)/hr"
 
