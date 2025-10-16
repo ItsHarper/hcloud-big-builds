@@ -10,7 +10,7 @@ export def main []: nothing -> nothing {
 		perform-build-step $"Initialize build dir for stable tag ($STABLE_TAG)" repo [
 			"init"
 			"-u"
-			"https://github.com/GrapheneOS/platform_manifest.git"
+			$MANIFEST_REPO_URL
 			"-b"
 			$"refs/tags/($STABLE_TAG)"
 		]
@@ -24,7 +24,7 @@ export def main []: nothing -> nothing {
 		perform-build-step $"Initialize build dir for dev branch ($DEV_BRANCH)" repo [
 			"init"
 			"-u"
-			"https://github.com/GrapheneOS/platform_manifest.git"
+			$MANIFEST_REPO_URL
 			"-b"
 			$DEV_BRANCH
 		]

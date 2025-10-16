@@ -1,7 +1,8 @@
 # Settings
-export const DEV_BRANCH = "16"
-export const STABLE_TAG = "2025092700"
-export const DOWNLOAD_STABLE = true
+export const MANIFEST_REPO_URL = "https://github.com/ItsHarper/GrapheneOS_platform_manifest.git"
+export const DEV_BRANCH = "2025100300-harper-dev"
+export const STABLE_TAG = "2025100300"
+export const DOWNLOAD_STABLE = false
 export const BUILD_VARIANT = "userdebug"
 
 # Other
