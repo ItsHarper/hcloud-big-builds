@@ -1,25 +1,37 @@
+use std-rfc/iter
 use ./util/vm-constants.nu *
 use ./util/perform-build-step.nu *
-use ./presets/graphene-os/run-build-graphene
-use ./presets/graphene-os/set-up-vm-for-graphene.nu
+use ./session-types/graphene-os/graphene-os-session-type.nu
 
-try {
-	set-up-vm-for-graphene
-	prepare-build-logs-dir
+def main [sessionTypeId: string]: nothing -> nothing {
+	let sessionTypes: table<id: string, setUpVm: closure, prepareBuildRoot: closure, runBuild: closure> = [
+		(graphene-os-session-type)
+	];
 
-	let runPreparation = not ($BUILD_ROOT_PREPARED_PATH | path exists)
+	try {
+		prepare-build-logs-dir
 
-	if $runPreparation {
-		use ./presets/graphene-os/prepare-build-root-graphene
-		prepare-build-root-graphene
-		touch $BUILD_ROOT_PREPARED_PATH
-		print "Finished preparing build root"
+		let sessionType = (
+			$sessionTypes
+			| where id == $sessionTypeId
+			| iter only
+		)
+
+		do $sessionType.setUpVm
+
+		let runPreparation = not ($BUILD_ROOT_PREPARED_PATH | path exists)
+
+		if $runPreparation {
+			do $sessionType.prepareBuildRoot
+			touch $BUILD_ROOT_PREPARED_PATH
+			print "Finished preparing build root"
+		}
+
+		do $sessionType.runBuild $runPreparation
+		print "Finished build"
+	} catch {|e|
+			print -e "Build failed:"
+			print -e $e.rendered
+			exit 1
 	}
-
-	run-build-graphene $runPreparation
-	print "Finished build"
-} catch {|e|
-	print -e "Build failed:"
-	print -e $e.rendered
-	exit 1
 }

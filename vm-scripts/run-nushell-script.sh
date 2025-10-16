@@ -20,5 +20,5 @@ if [[ ! -f $NU_PATH ]] || [[ "$($NU_PATH --version)" != "$NU_VERSION" ]]; then
 	tar xvzf "$NU_ARCHIVE_PATH" --strip-components=1 --directory "$NU_BIN_DIR"
 fi
 
-echo "Running $1"
-"$NU_BIN_DIR/nu" "$SCRIPT_DIR/$1"
+echo "Executing: $@"
+"$NU_BIN_DIR/nu" "$SCRIPT_DIR/$@"

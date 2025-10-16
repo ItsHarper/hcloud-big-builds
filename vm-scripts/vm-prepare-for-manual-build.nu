@@ -1,5 +1,5 @@
 use ./util/vm-constants.nu *
-use ./presets/graphene-os/set-up-vm-for-graphene.nu
+use ./session-types/graphene-os/set-up-vm-for-graphene.nu
 
 set-up-vm-for-graphene
 
