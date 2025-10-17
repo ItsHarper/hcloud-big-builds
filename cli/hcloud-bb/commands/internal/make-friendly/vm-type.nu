@@ -54,6 +54,6 @@ export def main [
 	)
 
 	$vmType
-	| select name architecture memory cpu_type cores ...$additionalFields
+	| select name architecture category memory cpu_type cores ...$additionalFields
 	| insert $CURRENCY_PER_HOUR $hourlyPrice
 }
