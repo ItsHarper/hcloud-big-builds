@@ -121,6 +121,9 @@ def reuse-existing-vm [vm: record]: nothing -> nothing {
 	if $status == "off" {
 		print "Starting VM"
 		hcloud server poweron $vm.name
+	} else if $status == "initializing" {
+		# TODO(Harper): Wait for the VM to start
+		error make { msg: "The VM is still being initialized" }
 	} else if $status != "running" {
 		error make { msg: $"Unrecognized VM status: ($status)" }
 	}
