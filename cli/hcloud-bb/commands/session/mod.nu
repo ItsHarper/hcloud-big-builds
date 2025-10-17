@@ -1,5 +1,6 @@
 export module ./create.nu
 export module ./destroy.nu
+export module ./download-outputs.nu
 export module ./run-build.nu
 
 export def main []: nothing -> nothing {
@@ -11,6 +12,7 @@ export def main []: nothing -> nothing {
 	[
 		"create"
 		"destroy"
+		"download-outputs"
 		"run-build"
 	]
 	| each { print $"  hcloud-bb session ($in)"}
