@@ -14,7 +14,10 @@ export def main [--preserve-on-exit, --no-preserve-on-exit, sessionId?: string]:
 
 	vm start $sessionId
 
-	$session.type.outputsToDownload
+	get-session-types
+	| where id == $session.typeId
+	| iter only
+	| get outputsToDownload
 	| each {
 		let outputToDownload: record<vmRelativePath: string, localRelativePath: string> = $in
 		print $"\nDownloading ($outputToDownload.vmRelativePath)"

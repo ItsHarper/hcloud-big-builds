@@ -32,7 +32,7 @@ export def main [--no-build]: nothing -> record {
 		| get primary_ip
 	)
 
-	save-new-session $sessionId $sessionType $resourcesName $volumeInfo.volume.linux_device $ipv4Info.ip
+	save-new-session $sessionId $sessionType.id $resourcesName $volumeInfo.volume.linux_device $ipv4Info.ip
 	print $"Successfully created session"
 
 	if not $no_build {
