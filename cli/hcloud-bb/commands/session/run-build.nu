@@ -14,6 +14,7 @@ export def main [
 	let vmTypeConstraint = {|vm|
 		(
 			$vm.cpu_type == "dedicated" and
+			$vm.architecture == "x86" and
 			($ignore_minimium_ram or $vm.memory >= $session.type.minRamGiB)
 		)
 	}

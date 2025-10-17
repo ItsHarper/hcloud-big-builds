@@ -5,7 +5,6 @@ use ($CLI_UTIL_DIR)/hcloud-wrapper.nu *
 
 export def main [
 	--full
-	--include-non-x86
 	additionalFields: list<string> = []
 ]: nothing -> table {
 	set-up-hcloud-context
@@ -21,7 +20,6 @@ export def main [
 	} else {
 		let friendlyList = (
 			$fullList
-			| where $include_non_x86 or $it.architecture == "x86"
 			| where {|vmType|
 				(
 					$vmType.prices
@@ -35,12 +33,7 @@ export def main [
 			| sort-by --reverse cpu_type
 		)
 
-		if $include_non_x86 {
-			$friendlyList
-			| sort-by architecture # Always sort by architecture last, there is no more important field
-		} else {
-			$friendlyList
-			| reject architecture
-		}
+		$friendlyList
+		| sort-by architecture # Always sort by architecture last, there is no more important field
 	}
 }
