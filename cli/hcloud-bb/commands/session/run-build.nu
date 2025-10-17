@@ -1,3 +1,4 @@
+use std-rfc/iter
 use ../../util/cli-constants.nu *
 use ($COMMON_CONSTANTS_PATH) *
 use ($CLI_UTIL_DIR)/ssh.nu *
@@ -13,10 +14,21 @@ export def main [
 	let session = get-session $sessionId
 	let sessionId: string = $session.id
 	let vmTypeConstraint = {|vm|
+		let ramIsAcceptable  = if ($ignore_minimium_ram) {
+			true
+		} else {
+			let sessionType = (
+				get-session-types
+				| where id == $session.typeId
+				| iter only
+			)
+			$vm.memory >= $sessionType.minRamGiB
+		}
+
 		(
 			$vm.cpu_type == "dedicated" and
 			$vm.architecture == "x86" and
-			($ignore_minimium_ram or $vm.memory >= $session.type.minRamGiB)
+			$ramIsAcceptable
 		)
 	}
 
@@ -24,7 +36,7 @@ export def main [
 
 	try {
 		print "Running vm-run-build.nu script on VM"
-		ssh-into-session-vm --command $"($RUN_NUSHELL_SCRIPT_VM_PATH) vm-run-build.nu ($session.type.id)" $sessionId
+		ssh-into-session-vm --command $"($RUN_NUSHELL_SCRIPT_VM_PATH) vm-run-build.nu ($session.typeId)" $sessionId
 
 		download-outputs --no-preserve-on-exit $sessionId
 	} catch {|e|
