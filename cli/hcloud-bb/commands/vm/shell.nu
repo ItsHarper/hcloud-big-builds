@@ -1,5 +1,6 @@
 use ../../util/cli-constants.nu *
 use ($CLI_UTIL_DIR)/ssh.nu *
+use ($CLI_UTIL_DIR)/state.nu *
 use ($CLI_COMMANDS_DIR)/vm/start.nu
 
 # TODO(Harper): Move to session command
