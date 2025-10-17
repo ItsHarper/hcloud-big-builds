@@ -7,7 +7,7 @@ export def main []: nothing -> nothing {
 	cd $BUILD_ROOT_VM_DIR
 
 	if $DOWNLOAD_STABLE {
-		perform-build-step $"Initialize build dir for stable tag ($STABLE_TAG)" repo [
+		perform-build-step $"Initialize repo for stable tag ($STABLE_TAG)" repo [
 			"init"
 			"-u"
 			$MANIFEST_REPO_URL
@@ -21,7 +21,7 @@ export def main []: nothing -> nothing {
 		git config gpg.ssh.allowedSignersFile ~/.ssh/grapheneos_allowed_signers
 		git verify-tag (git describe)
 	} else {
-		perform-build-step $"Initialize build dir for dev branch ($DEV_BRANCH)" repo [
+		perform-build-step $"Initialize repo for dev branch ($DEV_BRANCH)" repo [
 			"init"
 			"-u"
 			$MANIFEST_REPO_URL
