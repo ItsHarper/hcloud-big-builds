@@ -49,6 +49,8 @@ export def update-session-status [id: string, status: string]: nothing -> nothin
 	| update ([$id, status] | into cell-path) $status
 	| collect
 	| save -f $sessionsPath
+
+	print $"Session status is now ($status)"
 }
 
 export def delete-session [id: string]: nothing -> nothing {
