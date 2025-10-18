@@ -203,7 +203,7 @@ AllowAgentForwarding no
 		]
 		runcmd: [
 			[ "mkdir" $BUILD_ROOT_VM_DIR ]
-			[ "chmod" "777" $BUILD_ROOT_VM_DIR ]
+			[ "chown" $VM_USERNAME $BUILD_ROOT_VM_DIR ]
 		]
 	}
 }
