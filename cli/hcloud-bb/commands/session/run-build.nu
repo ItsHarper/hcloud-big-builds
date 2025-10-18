@@ -8,29 +8,17 @@ use ($CLI_COMMANDS_DIR)/vm
 use download-outputs.nu
 
 export def main [
-	--ignore-minimium-ram
 	sessionId?: string
 ]: nothing -> nothing {
 	let session = get-session $sessionId
 	let sessionId: string = $session.id
-	let vmTypeConstraint = {|vm|
-		let ramIsAcceptable  = if ($ignore_minimium_ram) {
-			true
-		} else {
-			let sessionType = (
-				get-session-types
-				| where id == $session.typeId
-				| iter only
-			)
-			$vm.memory >= $sessionType.minRamGiB
-		}
 
-		(
-			$vm.cpu_type == "dedicated" and
-			$vm.architecture == "x86" and
-			$ramIsAcceptable
-		)
-	}
+	let vmTypeConstraint = (
+		get-session-types
+		| where id == $session.typeId
+		| iter only
+		| get vmTypeConstraint
+	)
 
 	vm start $sessionId $vmTypeConstraint
 

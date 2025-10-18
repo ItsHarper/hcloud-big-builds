@@ -26,13 +26,19 @@ export const CONFIG_DIR_GITIGNORE_CONTENTS = $"
 ($HCLOUD_CONFIG_FILENAME)
 "
 
-export def get-session-types []: nothing -> table<id: string, description: string, volumeSizeGB: int, minRamGiB: int, outputsToDownload: table<vmRelativePath: string, localRelativePath: string>>  {
+export def get-session-types []: nothing -> table<id: string, description: string, volumeSizeGB: int, vmTypeConstraint: closure, outputsToDownload: table<vmRelativePath: string, localRelativePath: string>>  {
 	[
 		{
 			id: "graphene-os"
 			description: "GrapheneOS"
 			volumeSizeGB: 375
-			minRamGiB: 64,
+			vmTypeConstraint: {|vm|
+				(
+					$vm.cpu_type == "dedicated" and
+					$vm.architecture == "x86" and
+					$vm.memory >= 64
+				)
+			}
 			outputsToDownload: (
 				$GRAPHENE_BUILD_TARGETS
 				| each {|buildTarget|
@@ -51,7 +57,7 @@ export def get-session-types []: nothing -> table<id: string, description: strin
 			id: "test-only"
 			description: "Testing only"
 			volumeSizeGB: 10
-			minRamGiB: 0
+			vmTypeConstraint: {|vm| true}
 			outputsToDownload: []
 		}
 	]
