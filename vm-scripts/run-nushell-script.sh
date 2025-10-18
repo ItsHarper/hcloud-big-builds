@@ -3,7 +3,7 @@ set -euo pipefail
 
 NU_VERSION="0.107.0"
 NU_ARCHIVES_DIR="$HOME/nushell-bin-archives"
-NU_ARCHIVE_FILENAME="nu-$NU_VERSION-x86_64-unknown-linux-gnu.tar.gz"
+NU_ARCHIVE_FILENAME="nu-$NU_VERSION-$(uname -m)-unknown-linux-gnu.tar.gz"
 NU_ARCHIVE_PATH="$NU_ARCHIVES_DIR/$NU_ARCHIVE_FILENAME"
 NU_BIN_DIR="$HOME/nushell-bin"
 NU_PATH="$NU_BIN_DIR/nu"
