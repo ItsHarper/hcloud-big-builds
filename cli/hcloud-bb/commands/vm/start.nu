@@ -168,7 +168,7 @@ def generate-cloud-init-config [session: record<id: string, volumeDevPath: strin
 		mounts: [
 			[
 				$session.volumeDevPath
-				$BUILD_ROOT_VM_DIR
+				$MOUNT_POINT_VM_DIR
 				$VOLUME_FS
 				"discard,defaults"
 				"0"
@@ -202,6 +202,7 @@ AllowAgentForwarding no
 			}
 		]
 		runcmd: [
+			[ "mkdir" $BUILD_ROOT_VM_DIR ]
 			[ "chmod" "777" $BUILD_ROOT_VM_DIR ]
 		]
 	}
