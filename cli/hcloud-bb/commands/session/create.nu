@@ -31,7 +31,7 @@ export def main [--no-build typeId?: string]: nothing -> record {
 	let sessionId = random chars --length 7
 	let resourcesName = ($RESOURCES_NAME_PREFIX)-($sessionId)
 
-	print "Creating volume"
+	print $"Creating ($volumeSizeGB) GB volume"
 	let volumeInfo: record = (
 		hcloud volume create --name $resourcesName --size $volumeSizeGB --format $VOLUME_FS --location $VM_LOCATION --quiet --output "json"
 		| from json
