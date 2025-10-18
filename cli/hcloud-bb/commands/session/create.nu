@@ -7,12 +7,24 @@ use ($CLI_COMMANDS_DIR)/session/run-build.nu
 
 const SCRIPT_DIR = path self .
 
-export def main [--no-build]: nothing -> record {
+export def main [--no-build typeId?: string]: nothing -> record {
 	set-up-hcloud-context
 
 	let sessionType: record = (
-		get-session-types
-		| input list -d description "Select session type"
+		if $typeId == null {
+			get-session-types
+			| input list -d description "Select session type"
+		} else {
+			let result = (
+				get-session-types
+				| where id == $typeId
+				| get --optional 0
+			)
+			if $result == null {
+				error make { msg: $"Specified session type '($typeId)' is invalid" }
+			}
+			$result
+		}
 	)
 	let volumeSizeGB: int = $sessionType.volumeSizeGB
 
