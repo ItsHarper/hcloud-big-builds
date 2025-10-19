@@ -76,7 +76,7 @@ def get-needed-action [session: record, vmTypeConstraint: closure]: nothing -> c
 			# It's critical that we do NOT change the session's status, so we must use `hcloud` directly
 
 			print "Shutting down existing VM"
-			hcloud server shutdown --wait=true --wait-timeout 120s --quiet $existingVm.id
+			hcloud server shutdown --wait=true --wait-timeout $VM_SHUTDOWN_TIMEOUT --quiet $existingVm.id
 
 			print "Deleting existing VM"
 			hcloud server delete $existingVm.id

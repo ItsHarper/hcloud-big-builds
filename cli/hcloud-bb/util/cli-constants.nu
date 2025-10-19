@@ -13,6 +13,7 @@ export const VM_DATACENTER = $"($VM_LOCATION)-dc3" # Use `hcloud datacenter list
 export const VOLUME_FS = "ext4"
 
 export const VM_NUSHELL_VERSION = "0.107.0"
+export const VM_SHUTDOWN_TIMEOUT = "90s"
 
 # Other
 export const CLI_UTIL_DIR = path self .

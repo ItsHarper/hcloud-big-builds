@@ -15,7 +15,7 @@ export def main [
 	if $force {
 		# TODO(Harper): Check if VM is running using `cloud server describe`
 		print "Commanding VM to shut down cleanly"
-		hcloud server shutdown --wait-timeout 60s --quiet $session.resourcesName
+		hcloud server shutdown --wait-timeout $VM_SHUTDOWN_TIMEOUT --quiet $session.resourcesName
 
 		print "Deleting VM"
 		hcloud server delete $session.resourcesName
