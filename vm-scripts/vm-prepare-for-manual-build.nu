@@ -1,3 +1,5 @@
+#!/usr/bin/env nu
+
 use ./util/vm-constants.nu *
 use ./session-types/graphene-os/set-up-vm-for-graphene.nu
 

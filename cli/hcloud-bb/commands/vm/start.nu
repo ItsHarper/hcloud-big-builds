@@ -204,6 +204,12 @@ AllowAgentForwarding no
 		runcmd: [
 			[ "mkdir" $BUILD_ROOT_VM_DIR ]
 			[ "chown" $VM_USERNAME $BUILD_ROOT_VM_DIR ]
+			# `uname -m` needs to be run locally, so we specify this entry as a string (making it be interpreted by `sh`),
+			# and surround `uname -m` with `$\(` and `\)`
+			$"curl --location https://github.com/nushell/nushell/releases/download/($VM_NUSHELL_VERSION)/nu-($VM_NUSHELL_VERSION)-$\(uname -m\)-unknown-linux-gnu.tar.gz > /root/nushell.tar.gz"
+			[ mkdir -p /root/nushell ]
+			[ tar xvzf /root/nushell.tar.gz --strip-components=1 --directory /root/nushell ]
+			[ cp /root/nushell/nu /usr/local/bin]
 		]
 	}
 }

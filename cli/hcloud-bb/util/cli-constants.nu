@@ -12,6 +12,8 @@ export const VM_LOCATION = "nbg1" # Nuremburg, Germany
 export const VM_DATACENTER = $"($VM_LOCATION)-dc3" # Use `hcloud datacenter list`
 export const VOLUME_FS = "ext4"
 
+export const VM_NUSHELL_VERSION = "0.107.0"
+
 # Other
 export const CLI_UTIL_DIR = path self .
 export const CLI_COMMANDS_DIR = path self ../commands

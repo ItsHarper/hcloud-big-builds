@@ -24,7 +24,7 @@ export def main [
 
 	try {
 		print "Running vm-run-build.nu script on VM"
-		ssh-into-session-vm --command $"($RUN_NUSHELL_SCRIPT_VM_PATH) vm-run-build.nu ($session.typeId)" $sessionId
+		ssh-into-session-vm --command $"($VM_SCRIPTS_VM_DIR)/vm-run-build.nu ($session.typeId)" $sessionId
 
 		download-outputs --no-preserve-on-exit $sessionId
 	} catch {|e|

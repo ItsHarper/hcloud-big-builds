@@ -1,3 +1,5 @@
+#!/usr/bin/env nu
+
 use std-rfc/iter
 use ./util/vm-constants.nu *
 use ./util/perform-build-step.nu *
