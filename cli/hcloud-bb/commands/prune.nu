@@ -86,8 +86,20 @@ export def main []: nothing -> record {
 	}
 
 	touch $PRUNE_LOG_PATH
-	open $PRUNE_LOG_PATH
-	| default []
+
+	let pruneLog: table = try {
+		let parsedContents = open $PRUNE_LOG_PATH
+		let parsedType = $parsedContents | describe
+		if $parsedType starts-with "list" or $parsedType starts-with "table" {
+			$parsedContents
+		} else {
+			[]
+		}
+	} catch {
+		[]
+	}
+
+	$pruneLog
 	| append $result
 	| collect
 	| save -f $PRUNE_LOG_PATH
