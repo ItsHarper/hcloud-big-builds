@@ -8,6 +8,12 @@ use ./session-types/graphene-os/graphene-os-session-type.nu
 def main [sessionTypeId: string]: nothing -> nothing {
 	let sessionTypes: table<id: string, setUpVm: closure, prepareBuildRoot: closure, runBuild: closure> = [
 		(graphene-os-session-type)
+		{
+			id: "test-only"
+			setUpVm: { print "setUpVm (no-op)" }
+			prepareBuildRoot: { print "prepareBuildRoot (no-op)" }
+			runBuild: { print "runBuild (no-op)" }
+		}
 	];
 
 	try {
