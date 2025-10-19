@@ -26,6 +26,7 @@ export def main [
 		print "Running vm-run-build.nu script on VM"
 		ssh-into-session-vm --command $"($VM_SCRIPTS_VM_DIR)/vm-run-build.nu ($session.typeId)" $sessionId
 
+		print "\nDownloading build outputs"
 		download-outputs --no-preserve-on-exit $sessionId
 	} catch {|e|
 		print -e $e.rendered

@@ -32,13 +32,13 @@ def main [sessionTypeId: string]: nothing -> nothing {
 		if $runPreparation {
 			do $sessionType.prepareBuildRoot
 			touch $BUILD_ROOT_PREPARED_PATH
-			print "Finished preparing build root"
+			print "\nFinished preparing build root"
 		}
 
 		do $sessionType.runBuild $runPreparation
-		print "Finished build"
+		print "\nFinished build"
 	} catch {|e|
-			print -e "Build failed:"
+			print -e "\nBuild failed:"
 			print -e $e.rendered
 			exit 1
 	}
